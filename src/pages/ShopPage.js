@@ -1,0 +1,217 @@
+import React from 'react';
+import { Link } from "react-router-dom";
+import 'swiper/swiper-bundle.css'; // Ensure Swiper styles are imported
+import { products } from './Utils'; // Adjust path as needed
+import { useCart } from '../CartContext';
+//import { useWishlist } from '../WishlistContext';
+import './ShopPage.css'; // New CSS file for custom styles
+import bvideo from "../assets/bvideo.mp4"; // Make sure the extension matches your file type
+
+
+function ShopPage() {
+  const { addToCart } = useCart();
+  // const { addToWishlist } = useWishlist();
+
+  return (
+    <div className="shop-page">
+      <div className="mb-5 pb-xl-5" />
+      <div className="shop-main container d-flex pt-4 pt-xl-5">
+        {/* Sidebar */}
+        <div className="shop-sidebar side-sticky bg-body" id="shopFilter">
+          <div className="aside-header d-flex d-lg-none align-items-center">
+            <h3 className="text-uppercase fs-6 mb-0">Filter By</h3>
+            <button className="btn-close-lg js-close-aside btn-close-aside ms-auto" />
+          </div>
+          <div className="pt-4 pt-lg-0" />
+          <div className="accordion" id="categories-list">
+            <div className="accordion-item mb-4 pb-3">
+              <h5 className="accordion-header" id="accordion-heading-11">
+                <button className="accordion-button p-0 border-0 fs-5 text-uppercase" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-filter-1" aria-expanded="true" aria-controls="accordion-filter-1">
+                  Product Categories
+                  <svg className="accordion-button__icon type2" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg">
+                    <g aria-hidden="true" stroke="none" fillRule="evenodd">
+                      <path d="M5.35668 0.159286C5.16235 -0.053094 4.83769 -0.0530941 4.64287 0.159286L0.147611 5.05963C-0.0492049 5.27473 -0.049205 5.62357 0.147611 5.83813C0.344427 6.05323 0.664108 6.05323 0.860924 5.83813L5 1.32706L9.13858 5.83867C9.33589 6.05378 9.65507 6.05378 9.85239 5.83867C10.0492 5.62357 10.0492 5.27473 9.85239 5.06018L5.35668 0.159286Z" />
+                    </g>
+                  </svg>
+                </button>
+              </h5>
+              <div id="accordion-filter-1" className="accordion-collapse collapse show border-0" aria-labelledby="accordion-heading-11" data-bs-parent="#categories-list">
+                <div className="accordion-body px-0 pb-0 pt-3">
+                  <ul className="list list-inline mb-0">
+                    <li className="list-item"><Link to="/dresses" className="menu-link py-1">Dresses</Link></li>
+                    <li className="list-item"><Link to="/shorts" className="menu-link py-1">Shorts</Link></li>
+                    <li className="list-item"><Link to="/sweatshirts" className="menu-link py-1">Sweatshirts</Link></li>
+                    <li className="list-item"><Link to="/swimwear" className="menu-link py-1">Swimwear</Link></li>
+                    <li className="list-item"><Link to="/jackets" className="menu-link py-1">Jackets</Link></li>
+                    <li className="list-item"><Link to="/tshirts-tops" className="menu-link py-1">T-Shirts & Tops</Link></li>
+                    <li className="list-item"><Link to="/jeans" className="menu-link py-1">Jeans</Link></li>
+                    <li className="list-item"><Link to="/trousers" className="menu-link py-1">Trousers</Link></li>
+                    <li className="list-item"><Link to="/men" className="menu-link py-1">Men</Link></li>
+                    <li className="list-item"><Link to="/jumpers-cardigans" className="menu-link py-1">Jumpers & Cardigans</Link></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="accordion" id="size-filters">
+            <div className="accordion-item mb-4 pb-3">
+              <h5 className="accordion-header" id="accordion-heading-size">
+                <button className="accordion-button p-0 border-0 fs-5 text-uppercase" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-filter-size" aria-expanded="true" aria-controls="accordion-filter-size">
+                  Sizes
+                  <svg className="accordion-button__icon type2" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg">
+                    <g aria-hidden="true" stroke="none" fillRule="evenodd">
+                      <path d="M5.35668 0.159286C5.16235 -0.053094 4.83769 -0.0530941 4.64287 0.159286L0.147611 5.05963C-0.0492049 5.27473 -0.049205 5.62357 0.147611 5.83813C0.344427 6.05323 0.664108 6.05323 0.860924 5.83813L5 1.32706L9.13858 5.83867C9.33589 6.05378 9.65507 6.05378 9.85239 5.83867C10.0492 5.62357 10.0492 5.27473 9.85239 5.06018L5.35668 0.159286Z" />
+                    </g>
+                  </svg>
+                </button>
+              </h5>
+              <div id="accordion-filter-size" className="accordion-collapse collapse show border-0" aria-labelledby="accordion-heading-size" data-bs-parent="#size-filters">
+                <div className="accordion-body px-0 pb-0">
+                  <div className="d-flex flex-wrap">
+                    <Link to="/size/xs" className="swatch-size btn btn-sm btn-outline-light mb-3 me-3 js-filter">XS</Link>
+                    <Link to="/size/s" className="swatch-size btn btn-sm btn-outline-light mb-3 me-3 js-filter">S</Link>
+                    <Link to="/size/m" className="swatch-size btn btn-sm btn-outline-light mb-3 me-3 js-filter">M</Link>
+                    <Link to="/size/l" className="swatch-size btn btn-sm btn-outline-light mb-3 me-3 js-filter">L</Link>
+                    <Link to="/size/xl" className="swatch-size btn btn-sm btn-outline-light mb-3 me-3 js-filter">XL</Link>
+                    <Link to="/size/xxl" className="swatch-size btn btn-sm btn-outline-light mb-3 me-3 js-filter">XXL</Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+
+     {/* Main Content */}
+     <div className="shop-list flex-grow-1">
+          {/* Slideshow (unchanged) */}
+          <div className="swiper-container js-swiper-slider slideshow slideshow_small" data-settings='{"autoplay": {"delay": 5000}, "slidesPerView": 1, "effect": "fade", "loop": true, "pagination": {"el": ".slideshow-pagination", "type": "bullets", "clickable": true}}'>
+            <div className="swiper-wrapper">
+              <div className="swiper-slide">
+                <div className="overflow-hidden position-relative h-100" style={{ backgroundColor: '#eee' }}>
+                <video autoPlay loop muted className="w-100 h-100">
+            <source src={bvideo} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+                  <div className="slideshow-character position-absolute bottom-0 pos_right-center">
+                    <img loading="lazy" src="https://uomo-html.flexkitux.com/images/slideshow-character1.png" width={246} height={450} alt="Woman Fashion 1" className="slideshow-character__img animate animate_fade animate_btt animate_delay-9 w-auto h-auto" />
+                    <div className="character_markup">
+                      <p className="font-special text-uppercase animate animate_fade animate_rtl animate_delay-10">Summer</p>
+                    </div>
+                  </div>
+                 
+                </div>
+              </div>
+              <div className="swiper-slide">
+                <div className="overflow-hidden position-relative h-100" style={{ backgroundColor: '#eee' }}>
+                  <div className="slideshow-character position-absolute bottom-0 pos_right-center">
+                    <img loading="lazy" src="https://uomo-html.flexkitux.com/images/slideshow-character2.png" width={261} height={450} alt="Woman Fashion 2" className="slideshow-character__img animate animate_fade animate_btt animate_delay-9 w-auto h-auto" />
+                  </div>
+                  <div className="slideshow-text container position-absolute start-50 top-50 translate-middle p-3 p-xl-5">
+                    <h6 className="text_dash text-uppercase text-red fs-base fw-medium animate animate_fade animate_btt animate_delay-3">Summer 2024</h6>
+                    <h2 className="text-uppercase page-title fw-bold animate animate_fade animate_btt animate_delay-3">Hello New Season</h2>
+                    <h6 className="text-uppercase mb-3 animate animate_fade animate_btt animate_delay-3">Limited Time Offer - Up to 60% off & Free Shipping</h6>
+                    <Link to="/" className="btn-link btn-link_lg text-uppercase fw-medium animate animate_fade animate_btt animate_delay-3">Discover More</Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-3 p-xl-5">
+              <div className="slideshow-pagination d-flex align-items-center position-absolute bottom-0 mb-4" />
+            </div>
+          </div>
+
+
+
+          <div className="mb-3 pb-2 pb-xl-3" />
+          <div className="d-flex justify-content-between mb-4 pb-md-2">
+            <div className="breadcrumb mb-0 d-none d-md-block flex-grow-1">
+              <Link to="/" className="menu-link menu-link_us-s text-uppercase fw-medium">Home</Link>
+              <span className="breadcrumb-separator menu-link fw-medium ps-1 pe-1">/</span>
+              <Link to="/" className="menu-link menu-link_us-s text-uppercase fw-medium">The Shop</Link>
+            </div>
+          </div>
+
+          <div className="mb-3 pb-2 pb-xl-3" />
+
+          {/* Product Grid */}
+          <div className="product-grid">
+            {products.map((product) => (
+              <div className="product-card-wrapper" key={product.id}>
+                <div className="product-card mb-3 mb-md-4 mb-xxl-5">
+                  <div className="pc__img-wrapper">
+                    <div className="swiper-container background-img js-swiper-slider">
+                      <div className="swiper-wrapper">
+                        <div className="swiper-slide">
+                        <Link to={`/item/${product.id}`}>
+                            <img
+                              loading="lazy"
+                              src={product.image}
+                              alt={product.name}
+                              className="pc__img"
+                            />
+                          </Link>
+                        </div>
+                        {product.altImage && (
+                          <div className="swiper-slide">
+                            <Link to={`/item/${product.id}`}>
+                              <img
+                                loading="lazy"
+                                src={product.altImage}
+                                width={330}
+                                height={400}
+                                alt={product.name}
+                                className="pc__img"
+                              />
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                      <span className="pc__img-prev"><svg width={7} height={11} viewBox="0 0 7 11"><use href="#icon_prev_sm" /></svg></span>
+                      <span className="pc__img-next"><svg width={7} height={11} viewBox="0 0 7 11"><use href="#icon_next_sm" /></svg></span>
+                    </div>
+                 
+                    
+                    <button
+  className="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium"
+  onClick={() => {
+    addToCart(product);
+    document.body.style.overflow = 'auto';
+  }}
+>
+  Add To Cart
+</button>
+
+
+
+                  </div>
+                  <div className="pc__info position-relative">
+                    <p className="pc__category">{product.category}</p>
+                    <h6 className="pc__title">
+                      <Link to={`/item/${product.id}`}>{product.name}</Link>
+                    </h6>
+                    <div className="product-card__price d-flex">
+                      {product.oldPrice && <span className="money price price-old">${product.oldPrice}  </span>}
+                      <span className="money price price-sale">₦{product.price}</span>
+                    </div>
+                   
+                    {/*}
+                    <button
+                      className="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0"
+                      onClick={() => addToWishlist(product)}
+                    >
+                      <svg width={16} height={16} viewBox="0 0 20 20" fill="none"><use href="#icon_heart" /></svg>
+                    </button>*/}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ShopPage;

@@ -1,0 +1,254 @@
+.navbar {
+  background: grey;
+  color: black;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.logo-container {
+  flex-grow: 1;  /* Allows it to take space */
+  display: flex;
+  justify-content: center;
+  max-width: 150px; 
+}
+
+
+.logo {
+  font-size: 1rem;
+  color: black;
+  left: 50%;
+  transform: translateX(-50%);
+  position: absolute;
+  width: 150px;  /* Adjust logo width */
+  height: auto;
+}
+
+
+
+.nav-links {
+  display: flex;
+  flex: 2; /* Takes equal space */
+  gap: 20px;
+  
+}
+
+.nav-link {
+  color: white; 
+  text-decoration: none;
+  font-size: 1.2rem;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: #555;
+}
+
+.cart-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center; 
+}
+
+.cart-icon {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  position: relative;
+  font-size: 30px;
+}
+
+.cart-count {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px 10px;
+  font-size: 10px;
+}
+
+.cart-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background-color: white;
+  color: black;
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 350px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.cart-dropdown ul {
+  list-style-type: none;
+  padding: 0;
+
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  position: relative;
+  z-index: 1002; /* Ensure it's on top of everything */
+}
+
+.menu-toggle.menu-open {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  color: white;
+  z-index: 1002;
+}
+
+.cart-dropdown li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #333; /* Added bottom border */
+  margin: 8px;
+  padding: 7px;
+}
+
+.view-cart-btn {
+  display: block;
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  border-radius: 5px;
+  text-decoration: none;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.view-cart-btn:hover {
+  background-color: #555;
+}
+
+.cart-item-content span {
+  margin-right: 20px; /* Adds space between the spans */
+}
+
+.cart-item-content img {
+  margin-right: 10px; /* Adds space between the image and the item name */
+}
+
+.close-menu {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.remove-btn {
+ 
+  color: red;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
+    position: relative;
+  }
+
+  .navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    height: 50px;
+
+  }
+.cart-dropdown {
+width: 300px;
+
+}
+
+  .logo-container {
+   left: 50px;
+   margin-bottom: 40px;
+
+  }
+
+  .menu-toggle {
+    display: block;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    z-index: 1002;
+  }
+
+  .cart-container {
+    position: absolute;
+    right: 10px;
+  
+  }
+
+  .cart-item-content {
+    font-size: 10px;
+  }
+
+  /* Hide nav links by default */
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background: grey;
+    text-align: center;
+    z-index: 1001;
+    padding: 10px 0;
+  }
+
+  /* Show nav links when menu is open */
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-link {
+    padding: 10px;
+    width: 100%;
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+  }
+
+  .nav-link:hover {
+    background-color: #555;
+  }
+}

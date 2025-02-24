@@ -1,0 +1,78 @@
+.swatch {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+  }
+  
+  .swatch:hover {
+    border-color: black;
+  }
+  
+  .swatch.selected {
+    border: 2px solid black;
+    font-weight: bold;
+    background-color: grey;
+  }
+  
+ 
+  /* Remove Border Around Quantity Control Buttons */
+.qty-control__reduce,
+.qty-control__increase {
+  border: none;  /* Remove the border */
+  background-color: transparent;  /* Make the background transparent */
+  font-size: 20px;  /* Adjust the size to match design */
+  color: #333;  /* Adjust the color if needed */
+  cursor: pointer;  /* Ensure it's clickable */
+  padding: 10px 15px;  /* Adjust padding for better appearance */
+}
+
+.qty-control__reduce:hover,
+.qty-control__increase:hover {
+  background-color: #f0f0f0;  /* Optional: Add hover effect */
+}
+
+/* Optional: Adding focus effect */
+.qty-control__reduce:focus,
+.qty-control__increase:focus {
+  outline: none;  /* Remove any outline */
+}
+
+/* Remove underline or other hover effects from the link */
+.product-single__addtolinks a {
+    text-decoration: none;  /* Ensures no underline */
+  }
+  
+  /* Optionally, for hover effects, ensure nothing changes */
+  .product-single__addtolinks a:hover {
+    text-decoration: none;  /* No underline on hover */
+    color: inherit;          /* Ensure color stays the same */
+  }
+  
+  
+  .product-single__details-accordion {
+    max-width: 70%; /* Adjust this value as needed */
+    margin: 0 auto; /* Centers the div and adds space on both sides */
+  }
+  
+  .row {
+    margin: 10px;
+  }
+  
+  .product-image-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.small-product-img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
