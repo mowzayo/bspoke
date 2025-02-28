@@ -1,0 +1,6 @@
+.checkout-steps__item.active {
+    border-bottom: 2px solid black; /* Example effect */
+    font-weight: bold;
+    color: black;
+  }
+  

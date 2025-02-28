@@ -1,9 +1,10 @@
 import React from 'react';
-import {  Link } from 'react-router-dom';
+import {  Link,useLocation } from 'react-router-dom';
 import { useCart } from '../CartContext';
+import './CartCheckout.css'
 
 function CartCheckout() {
-
+  const location = useLocation(); // Get current URL
   const { cart } = useCart();
 
   // Calculate subtotal
@@ -28,14 +29,20 @@ function CartCheckout() {
         <div className="mb-4 pb-4"/>
           <h2 className="page-title">Shipping and Checkout</h2>
           <div className="checkout-steps">
-      <Link to="/Cart" className="checkout-steps__item active">
+          <Link
+        to="/Cart"
+        className={`checkout-steps__item ${location.pathname === "/Cart" ? "active" : ""}`}
+      >
         <span className="checkout-steps__item-number">01</span>
         <span className="checkout-steps__item-title">
           <span>Shopping Bag</span>
           <em>Manage Your Items List</em>
         </span>
       </Link>
-  <Link to="/CartCheckout" className="checkout-steps__item">
+      <Link
+        to="/CartCheckout"
+        className={`checkout-steps__item ${location.pathname === "/CartCheckout" ? "active" : ""}`}
+      >
     <span className="checkout-steps__item-number">02</span>
     <span className="checkout-steps__item-title">
       <span>Shipping and Checkout</span>
@@ -43,7 +50,10 @@ function CartCheckout() {
     </span>
   </Link>
 
-  <Link to="/CartComplete" className="checkout-steps__item">
+  <Link
+        to="/CartComplete"
+        className={`checkout-steps__item ${location.pathname === "/CartComplete" ? "active" : ""}`}
+      >
     <span className="checkout-steps__item-number">03</span>
     <span className="checkout-steps__item-title">
       <span>Confirmation</span>

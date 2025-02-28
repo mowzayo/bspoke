@@ -1,10 +1,10 @@
 /* Slideshow container */
 .slideshow-container {
     position: relative;
-    width: 100vw; /* Full screen width */
-    height: 100vh; /* Full screen height */
+    width: 100%; /* Full screen width */
+    height: 80vh; /* Full screen height */
     overflow: hidden; /* Hide anything outside the container */
-    margin: 10px;
+
   }
   
   /* Images */
@@ -218,7 +218,7 @@
     flex-direction: column;
     gap: 10px;
     transition: opacity 0.3s ease;
-    border-radius: 5px;
+
   }
   
   .product-image:hover .overlay {
@@ -227,7 +227,7 @@
   
   /* Buttons inside the overlay */
   .overlay button {
-    padding: 10px 20px;
+    padding: 5px 10px;
     border: none;
     border-radius: 5px;
     background-color: #fff;
@@ -235,10 +235,11 @@
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
+   
   }
   
   .overlay button:hover {
-    background-color: #007bff;
+   background-color: #007bff;
     color: #fff;
   }
   
@@ -273,7 +274,6 @@
     width: 100%;
   }
   
-
 
 
 
@@ -322,5 +322,12 @@
     font-weight: bold;
   
   }
+
+  .overlay button {
+    padding: 2px 5px; /* Reduce padding */
+    font-size: 12px; /* Decrease font size */
+    border-radius: 3px; /* Slightly reduce border radius */
+}
+
   }
   

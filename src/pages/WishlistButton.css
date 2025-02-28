@@ -1,0 +1,39 @@
+.wishlist-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Replaces space-x-3 */
+  border: 1px solid #d1d5db; /* Tailwind gray-400 */
+  border-radius: 5px;
+  padding: 0.25rem 0.5rem; /* Replaces px-2 py-1 */
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wishlist-icon {
+  display: inline-block;
+  cursor: pointer;
+  gap: 5px;
+}
+
+/* Ensure text and icon styles are clean */
+.text-sm {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.text-black {
+  color: #000;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}
+
+.text-red-500 {
+  color: #ef4444;
+}

@@ -1,9 +1,11 @@
 import React from 'react';
 import { useCart } from '../CartContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import './Cart.css'
 
 function Cart() {
   const { cart, updateQuantity, removeFromCart } = useCart();
+  const location = useLocation(); // Get current URL
 
   // Calculate subtotal
   const subtotal = cart.reduce((acc, item) => {
@@ -14,7 +16,7 @@ function Cart() {
     return acc + price * quantity;
   }, 0);
 
-  // Calculate 5% VAT
+  // Calculate 5% VAThey baby  
   const vat = subtotal * 0.05;
 
   // Calculate total
@@ -27,21 +29,30 @@ function Cart() {
         <h2 className="page-title">Cart</h2>
 
         <div className="checkout-steps">
-          <Link to="/Cart" className="checkout-steps__item active">
+        <Link
+        to="/Cart"
+        className={`checkout-steps__item ${location.pathname === "/Cart" ? "active" : ""}`}
+      >
             <span className="checkout-steps__item-number">01</span>
             <span className="checkout-steps__item-title">
               <span>Shopping Bag</span>
               <em>Manage Your Items List</em>
             </span>
           </Link>
-          <Link to="/CartCheckout" className="checkout-steps__item">
+          <Link
+        to="/CartCheckout"
+        className={`checkout-steps__item ${location.pathname === "/CartCheckout" ? "active" : ""}`}
+      >
             <span className="checkout-steps__item-number">02</span>
             <span className="checkout-steps__item-title">
               <span>Shipping and Checkout</span>
               <em>Checkout Your Items List</em>
             </span>
           </Link>
-          <Link to="/CartComplete" className="checkout-steps__item">
+          <Link
+        to="/CartComplete"
+        className={`checkout-steps__item ${location.pathname === "/CartComplete" ? "active" : ""}`}
+      >
             <span className="checkout-steps__item-number">03</span>
             <span className="checkout-steps__item-title">
               <span>Confirmation</span>
