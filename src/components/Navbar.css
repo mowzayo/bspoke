@@ -60,6 +60,7 @@
   display: flex;
   justify-content: flex-end;
   align-items: center; 
+  top: 20px;
 }
 
 .cart-icon {
@@ -74,7 +75,7 @@
 
 .cart-count {
   position: absolute;
-  top: -5px;
+  top: 5px;
   right: -10px;
   background-color: rgb(242, 242, 245);
   color: rgb(3, 3, 3);
@@ -250,5 +251,8 @@ width: 300px;
 
   .nav-link:hover {
     background-color: #555;
+  }
+    .cart-icon {
+    bottom: 20px;
   }
 }
