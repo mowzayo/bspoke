@@ -14,6 +14,7 @@ function ItemPage() {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -37,7 +38,6 @@ function ItemPage() {
 
   const handleSizeSelect = (size) => {
     if (selectedSize !== size) {
-      // Prevent double trigger
       console.log("Size selected:", size);
       setSelectedSize(size);
     }
@@ -46,8 +46,8 @@ function ItemPage() {
   const handleAddToCart = useCallback(
     (e) => {
       e.preventDefault();
-      if (!product) {
-        console.warn("No product to add to cart.");
+      if (!product || isAddingToCart) {
+        console.warn("No product or already adding to cart.");
         return;
       }
 
@@ -58,7 +58,7 @@ function ItemPage() {
 
       const formattedPrice =
         typeof product.price === "string"
-          ? parseFloat(product.price.replace("$", "").trim()) || 0
+          ? parseFloat(product.price.replace("₦", "").trim()) || 0 // Adjusted for ₦
           : product.price || 0;
 
       const productWithSelection = {
@@ -69,14 +69,20 @@ function ItemPage() {
         price: formattedPrice,
       };
 
+      console.log("Adding to cart:", productWithSelection); // Debug
       setIsAddingToCart(true);
-      addToCart(productWithSelection);
-      setIsAddingToCart(false);
+      setShowPrompt(true);
 
-      // Reset body overflow in case js-open-aside locked it
+      addToCart(productWithSelection);
+
+      setTimeout(() => {
+        setIsAddingToCart(false);
+        setShowPrompt(false);
+      }, 2000); // Simplified timing
+
       document.body.style.overflow = "auto";
     },
-    [selectedSize, quantity, product, addToCart, productId]
+    [selectedSize, quantity, product, addToCart, productId, isAddingToCart]
   );
 
   if (loading) return <p>Loading product...</p>;
@@ -144,6 +150,7 @@ function ItemPage() {
                 className="qty-control__number text-center"
                 onChange={(e) => {
                   const newQuantity = Number(e.target.value);
+                  console.log("Quantity changed to:", newQuantity); // Debug
                   if (!isNaN(newQuantity) && newQuantity >= 1) {
                     setQuantity(newQuantity);
                   }
@@ -157,14 +164,37 @@ function ItemPage() {
                 +
               </button>
             </div>
+
             <button
               type="button"
-              className="btn btn-primary btn-addtocart" // Removed js-open-aside
+              className="btn btn-primary btn-addtocart"
               disabled={isAddingToCart}
               onClick={handleAddToCart}
             >
               {isAddingToCart ? "Adding..." : "Add to Cart"}
             </button>
+
+            {showPrompt && (
+              <div
+                className="cart-prompt"
+                style={{
+                  position: "fixed",
+                  top: "130px",
+                  left: "50%",
+                  width: "100%",
+                  transform: "translateX(-50%)",
+                  color: "green",
+                  backgroundColor: "#d4edda",
+                  padding: "5px 10px",
+                  borderRadius: "4px",
+                  zIndex: 10,
+                  textAlign: "center",
+                  fontSize: "20px",
+                }}
+              >
+                Added to Cart!
+              </div>
+            )}
           </div>
         </div>
         <div className="product-single__addtolinks">
@@ -181,7 +211,7 @@ function ItemPage() {
               href="#tab-description"
               role="tab"
               aria-controls="tab-description"
-              aria-selected="false"
+              aria-selected="true"
             >
               Description
             </a>
