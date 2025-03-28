@@ -1,0 +1,11 @@
+/* App.css */
+html,
+body,
+#root,
+.app-container {
+  min-height: 100vh;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+}

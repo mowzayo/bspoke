@@ -1,24 +1,50 @@
-import { useState } from "react";
-import { useWishlist } from "../WishlistContext";
+import { useState, useEffect } from "react";
+import { useCart } from "../CartContext";
 import { FaRegHeart, FaHeart } from "react-icons/fa6";
 import "./WishlistButton.css";
 
 function WishlistButton({ product, iconOnly = false }) {
-  const { addToWishlist, removeFromWishlist, wishlist } = useWishlist();
-  const [isAdded, setIsAdded] = useState(
-    wishlist.some((item) => item.id === product.id)
-  );
+  const { wishlist, addToWishlist, removeFromWishlist } = useCart() || {};
+  const [isAdded, setIsAdded] = useState(false);
 
-  // Debug log to confirm prop
+  useEffect(() => {
+    if (!product || !product._id) {
+      console.warn("WishlistButton: Invalid product prop", product);
+      setIsAdded(false);
+      return;
+    }
+    if (!wishlist || !wishlist.items) {
+      console.warn(
+        "WishlistButton: Wishlist is undefined or missing items",
+        wishlist
+      );
+      setIsAdded(false);
+      return;
+    }
+    const added = wishlist.items.some((item) => {
+      const productId = item.productId?._id || item.productId; // Handle ObjectId or string
+      return productId?.toString() === product._id?.toString();
+    });
+    setIsAdded(added);
+  }, [wishlist, product]);
+
+  // Debug logs
   console.log("WishlistButton - iconOnly:", iconOnly);
+  console.log("WishlistButton - Product:", product);
+  console.log("WishlistButton - Wishlist:", wishlist);
+  console.log("WishlistButton - Context:", {
+    wishlist,
+    addToWishlist,
+    removeFromWishlist,
+  });
 
   if (!addToWishlist || !removeFromWishlist) {
-    console.error("Wishlist functions are undefined. Check WishlistProvider.");
+    console.error("Wishlist functions are undefined. Check CartProvider.");
     return null;
   }
 
   const handleWishlistClick = () => {
-    if (!product || !product.name || !product.price) {
+    if (!product || !product._id) {
       alert(
         "Error: Product details are missing! Check the console for details."
       );
@@ -27,7 +53,7 @@ function WishlistButton({ product, iconOnly = false }) {
     }
 
     if (isAdded) {
-      removeFromWishlist(product.id);
+      removeFromWishlist(product._id);
       setIsAdded(false);
     } else {
       addToWishlist(product);

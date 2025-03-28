@@ -1,0 +1,201 @@
+/* Reusing variables from Login.css for consistency */
+
+body {
+  font-family: Mulish, sans-serif;
+  font-size: 1rem;
+
+  margin: 0;
+  padding: 0;
+}
+
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.dashboard h1 {
+  font-size: 2rem;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.product-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 3rem;
+}
+
+.product-form input,
+.product-form textarea {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--secondary);
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  color: var(--secondary);
+  background: transparent;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.product-form input:focus,
+.product-form textarea:focus {
+  border-color: var(--primary);
+}
+
+.product-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.product-form input[type="file"] {
+  padding: 0.5rem 0;
+  border: none;
+}
+
+.product-form button {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  width: 100%;
+}
+
+.product-form button:hover {
+  background: #3a5ecc; /* Slightly darker shade of --primary */
+}
+
+.dashboard h2 {
+  font-size: 1.5rem;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.the {
+  background: var(--primary-light);
+  color: var(--text);
+}
+
+th,
+td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--primary-light);
+}
+
+th {
+  font-weight: 700;
+}
+
+td img {
+  border-radius: 0.25rem;
+}
+
+tbody tr:hover {
+  background: #f9f9f9; /* Light hover effect */
+}
+
+td button {
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+td button:first-child {
+  /* Edit button */
+  background: #28a745; /* Green */
+  color: white;
+}
+
+td button:first-child:hover {
+  background: #218838; /* Darker green */
+}
+
+td button:last-child {
+  /* Delete button */
+  background: #dc3545; /* Red */
+  color: white;
+}
+
+td button:last-child:hover {
+  background: #c82333; /* Darker red */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1rem;
+  }
+
+  .product-form {
+    padding: 1.5rem;
+  }
+
+  th,
+  td {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  td img {
+    width: 40px; /* Smaller images on mobile */
+  }
+
+  td button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem; /* Stack buttons vertically */
+    display: block;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard h1 {
+    font-size: 1.5rem;
+  }
+
+  .dashboard h2 {
+    font-size: 1.25rem;
+  }
+
+  .product-form input,
+  .product-form textarea {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .product-form button {
+    padding: 0.6rem 1rem;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto; /* Horizontal scroll for small screens */
+  }
+}

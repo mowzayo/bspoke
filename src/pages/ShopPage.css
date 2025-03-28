@@ -3,6 +3,7 @@
   /*grid-template-columns: repeat(3, 1fr); 3 columns on all sizes */
   gap: 20px; /* Space between items */
   padding: 0 15px; /* Optional padding */
+  line-height: 1px;
 }
 
 .product-card-wrapper {

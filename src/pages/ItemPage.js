@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useCart } from "../CartContext";
 import { useParams } from "react-router-dom";
 import WishlistButton from "./WishlistButton";
-import { getProductById } from "./Utils";
 import "./ItemPage.css";
 
 function ItemPage() {
@@ -20,11 +19,11 @@ function ItemPage() {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const fetchedProduct = await getProductById(Number(productId));
-        if (!fetchedProduct) {
-          console.error("Product not found for ID:", productId);
-          return;
-        }
+        const response = await fetch(
+          `http://localhost:5000/api/products/${productId}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch product");
+        const fetchedProduct = await response.json();
         console.log("Fetched product:", fetchedProduct);
         setProduct(fetchedProduct);
       } catch (error) {
@@ -58,18 +57,18 @@ function ItemPage() {
 
       const formattedPrice =
         typeof product.price === "string"
-          ? parseFloat(product.price.replace("₦", "").trim()) || 0 // Adjusted for ₦
+          ? parseFloat(product.price.replace("₦", "").trim()) || 0
           : product.price || 0;
 
       const productWithSelection = {
         ...product,
-        id: product.id || `temp-${productId}`,
+        id: product._id,
         size: selectedSize,
         quantity: Number(quantity),
         price: formattedPrice,
       };
 
-      console.log("Adding to cart:", productWithSelection); // Debug
+      console.log("Adding to cart:", productWithSelection);
       setIsAddingToCart(true);
       setShowPrompt(true);
 
@@ -78,130 +77,144 @@ function ItemPage() {
       setTimeout(() => {
         setIsAddingToCart(false);
         setShowPrompt(false);
-      }, 2000); // Simplified timing
+      }, 2000);
 
       document.body.style.overflow = "auto";
     },
-    [selectedSize, quantity, product, addToCart, productId, isAddingToCart]
+    [selectedSize, quantity, product, addToCart, isAddingToCart]
   );
 
   if (loading) return <p>Loading product...</p>;
   if (!product) return <p>Product not found.</p>;
 
   return (
-    <div className="row">
+    <div className="row container mx-auto p-4">
       <div className="col-lg-7">
         <div className="product-single__media">
           <div className="product-single__image">
-            <img src={product.image} alt={product.name} className="shopimg" />
+            <img
+              src={Array.isArray(product.images) ? product.images[0] : ""}
+              alt={product.name}
+              className="shopimg w-full h-auto"
+            />
           </div>
         </div>
       </div>
       <div className="col-lg-5">
         <div className="mb-lg-5 pb-lg-5"></div>
-        <h2 className="product-single__name">{product.name}</h2>
+        <h2 className="product-single__name text-2xl font-bold mb-2">
+          {product.name}
+        </h2>
         <div className="product-single__price">
-          <p className="current-price">₦{product.price}</p>
+          <p className="current-price text-lg mt-0">₦{product.price}</p>
         </div>
-        <p className="product-single__short-desc">{product.description}</p>
-        <div>
-          <div className="product-single__swatches">
-            <div className="product-swatch text-swatches">
-              <label className="h6">Sizes</label>
-              <div className="swatch-list">
-                {["XS", "S", "M", "L", "XL"].map((size) => (
-                  <label
-                    key={size}
-                    className={`swatch js-swatch ${selectedSize === size ? "selected" : ""}`}
-                    title={size}
-                    onClick={() => handleSizeSelect(size)}
-                  >
-                    <input
-                      type="radio"
-                      name="size"
-                      value={size}
-                      checked={selectedSize === size}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        handleSizeSelect(size);
-                      }}
-                      style={{ display: "none" }}
-                    />
-                    {size}
-                  </label>
-                ))}
-              </div>
+
+        {/* Size Selection */}
+        <div className="product-single__swatches mt-3ss">
+          <div className="product-swatch text-swatches">
+            <label className="h6 mb-1">Sizes</label>{" "}
+            {/* Added mb-1 for tighter spacing */}
+            <div className="swatch-list flex flex-wrap gap-1">
+              {["XS", "S", "M", "L", "XL"].map((size) => (
+                <label
+                  key={size}
+                  className={`swatch js-swatch px-3 py-1 rounded cursor-pointer ${
+                    selectedSize === size
+                      ? "selected bg-gray-500 text-white"
+                      : "bg-gray-200"
+                  }`}
+                  title={size}
+                  onClick={() => handleSizeSelect(size)}
+                >
+                  <input
+                    type="radio"
+                    name="size"
+                    value={size}
+                    checked={selectedSize === size}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleSizeSelect(size);
+                    }}
+                    style={{ display: "none" }}
+                  />
+                  {size}
+                </label>
+              ))}
             </div>
           </div>
-          <div className="product-single__addtocart">
-            <div className="qty-control position-relative">
-              <button
-                type="button"
-                className="qty-control__reduce"
-                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-              >
-                -
-              </button>
-              <input
-                type="number"
-                name="quantity"
-                value={quantity}
-                min={1}
-                className="qty-control__number text-center"
-                onChange={(e) => {
-                  const newQuantity = Number(e.target.value);
-                  console.log("Quantity changed to:", newQuantity); // Debug
-                  if (!isNaN(newQuantity) && newQuantity >= 1) {
-                    setQuantity(newQuantity);
-                  }
-                }}
-              />
-              <button
-                type="button"
-                className="qty-control__increase"
-                onClick={() => setQuantity((prev) => prev + 1)}
-              >
-                +
-              </button>
-            </div>
+        </div>
 
+        {/* Quantity and Add to Cart */}
+        <div className="product-single__addtocart mt-4">
+          <div className="qty-control position-relative flex items-center space-x-2">
             <button
               type="button"
-              className="btn btn-primary btn-addtocart"
-              disabled={isAddingToCart}
-              onClick={handleAddToCart}
+              className="qty-control__reduce bg-gray-300 px-2 py-1 rounded"
+              onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
             >
-              {isAddingToCart ? "Adding..." : "Add to Cart"}
+              -
             </button>
-
-            {showPrompt && (
-              <div
-                className="cart-prompt"
-                style={{
-                  position: "fixed",
-                  top: "130px",
-                  left: "50%",
-                  width: "100%",
-                  transform: "translateX(-50%)",
-                  color: "green",
-                  backgroundColor: "#d4edda",
-                  padding: "5px 10px",
-                  borderRadius: "4px",
-                  zIndex: 10,
-                  textAlign: "center",
-                  fontSize: "20px",
-                }}
-              >
-                Added to Cart!
-              </div>
-            )}
+            <input
+              type="number"
+              name="quantity"
+              value={quantity}
+              min={1}
+              className="qty-control__number text-center w-16 border p-1"
+              onChange={(e) => {
+                const newQuantity = Number(e.target.value);
+                if (!isNaN(newQuantity) && newQuantity >= 1) {
+                  setQuantity(newQuantity);
+                }
+              }}
+            />
+            <button
+              type="button"
+              className="qty-control__increase bg-gray-300 px-2 py-1 rounded"
+              onClick={() => setQuantity((prev) => prev + 1)}
+            >
+              +
+            </button>
           </div>
+
+          <button
+            type="button"
+            className="btn btn-primary btn-addtocart ml-4 px-4 py-2"
+            disabled={isAddingToCart}
+            onClick={handleAddToCart}
+          >
+            {isAddingToCart ? "Adding..." : "Add to Cart"}
+          </button>
+
+          {showPrompt && (
+            <div
+              className="cart-prompt"
+              style={{
+                position: "fixed",
+                top: "130px",
+                left: "50%",
+                width: "100%",
+                transform: "translateX(-50%)",
+                color: "green",
+                backgroundColor: "#d4edda",
+                padding: "5px 10px",
+                borderRadius: "4px",
+                zIndex: 10,
+                textAlign: "center",
+                fontSize: "20px",
+              }}
+            >
+              Added to Cart!
+            </div>
+          )}
         </div>
-        <div className="product-single__addtolinks">
+
+        <div className="product-single__addtolinks mt-1">
           <WishlistButton product={product} />
         </div>
       </div>
-      <div className="product-single__details-tab">
+
+      {/* Tabs */}
+      <div className="product-single__details-tab mt-2 ">
         <ul className="nav nav-tabs" id="myTab" role="tablist">
           <li className="nav-item" role="presentation">
             <a
@@ -216,7 +229,7 @@ function ItemPage() {
               Description
             </a>
           </li>
-          <li className="nav-item" role="presentation">
+          <li className="nav-item">
             <a
               className="nav-link nav-link_underscore"
               id="tab-additional-info-tab"
@@ -232,14 +245,14 @@ function ItemPage() {
           <li className="nav-item" role="presentation">
             <a
               className="nav-link nav-link_underscore"
-              id="tab-reviews-tab"
+              id="tab-size-guide-tab"
               data-bs-toggle="tab"
-              href="#tab-reviews"
+              href="#tab-size-guide"
               role="tab"
-              aria-controls="tab-reviews"
+              aria-controls="tab-size-guide"
               aria-selected="false"
             >
-              Reviews (2)
+              Size Guide
             </a>
           </li>
         </ul>
@@ -251,46 +264,10 @@ function ItemPage() {
             aria-labelledby="tab-description-tab"
           >
             <div className="product-single__description">
-              <h3 className="block-title mb-4">
-                Sed do eiusmod tempor incididunt ut labore
-              </h3>
+              <h3 className="block-title mb-4">{product.name} Overview</h3>
               <p className="content">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                sunt in culpa qui officia deserunt mollit anim id est laborum.
-                Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-                quae ab illo inventore veritatis et quasi architecto beatae
-                vitae dicta sunt explicabo.
+                {product.description || "No detailed description available."}
               </p>
-              <div className="row">
-                <div className="col-lg-6">
-                  <h3 className="block-title">Why choose product?</h3>
-                  <ul className="list text-list">
-                    <li>Creat by cotton fibric with soft and smooth</li>
-                    <li>
-                      Simple, Configurable (e.g. size, color, etc.), bundled
-                    </li>
-                    <li>Downloadable/Digital Products, Virtual Products</li>
-                  </ul>
-                </div>
-                <div className="col-lg-6">
-                  <h3 className="block-title">Sample Number List</h3>
-                  <ol className="list text-list">
-                    <li>Create Store-specific attrittbutes on the fly</li>
-                    <li>
-                      Simple, Configurable (e.g. size, color, etc.), bundled
-                    </li>
-                    <li>Downloadable/Digital Products, Virtual Products</li>
-                  </ol>
-                </div>
-              </div>
-              <h3 className="block-title mb-0">Lining</h3>
-              <p className="content">100% Polyester, Main: 100% Polyester.</p>
             </div>
           </div>
           <div
@@ -302,270 +279,63 @@ function ItemPage() {
             <div className="product-single__addtional-info">
               <div className="item">
                 <label className="h6">Weight</label>
-                <span>1.25 kg</span>
+                <span>{product.weight || "N/A"}</span>
               </div>
               <div className="item">
                 <label className="h6">Dimensions</label>
-                <span>90 x 60 x 90 cm</span>
+                <span>{product.dimensions || "N/A"}</span>
               </div>
               <div className="item">
-                <label className="h6">Size</label>
-                <span>XS, S, M, L, XL</span>
-              </div>
-              <div className="item">
-                <label className="h6">Color</label>
-                <span>Black, Orange, White</span>
-              </div>
-              <div className="item">
-                <label className="h6">Storage</label>
-                <span>Relaxed fit shirt-style dress with a rugged</span>
+                <label className="h6">Sizes</label>
+                <span>{product.sizes.join(", ")}</span>
               </div>
             </div>
           </div>
           <div
             className="tab-pane fade"
-            id="tab-reviews"
+            id="tab-size-guide"
             role="tabpanel"
-            aria-labelledby="tab-reviews-tab"
+            aria-labelledby="tab-size-guide-tab"
           >
-            <h2 className="product-single__reviews-title">Reviews</h2>
-            <div className="product-single__reviews-list">
-              <div className="product-single__reviews-item">
-                <div className="customer-avatar">
-                  <img
-                    loading="lazy"
-                    src="https://uomo-html.flexkitux.com/images/avatar.jpg"
-                    alt=""
-                  />
-                </div>
-                <div className="customer-review">
-                  <div className="customer-name">
-                    <h6>Janice Miller</h6>
-                    <div className="reviews-group d-flex">
-                      <svg
-                        className="review-star"
-                        viewBox="0 0 9 9"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg
-                        className="review-star"
-                        viewBox="0 0 9 9"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg
-                        className="review-star"
-                        viewBox="0 0 9 9"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg
-                        className="review-star"
-                        viewBox="0 0 9 9"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg
-                        className="review-star"
-                        viewBox="0 0 9 9"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <use href="#icon_star" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="review-date">April 06, 2023</div>
-                  <div className="review-text">
-                    <p>
-                      Nam libero tempore, cum soluta nobis est eligendi optio
-                      cumque nihil impedit quo minus id quod maxime placeat
-                      facere possimus, omnis voluptas assumenda est…
-                    </p>
-                  </div>
-                </div>
+            <div className="size-guide">
+              <h3 className="block-title mb-4">Size Guide</h3>
+              <div className="grid grid-cols-7 gap-2 text-center">
+                <div className="font-semibold">SIZE</div>
+                <div className="font-semibold">XS</div>
+                <div className="font-semibold">S</div>
+                <div className="font-semibold">M</div>
+                <div className="font-semibold">L</div>
+                <div className="font-semibold">XL</div>
+                <div className="font-semibold">XXL</div>
+
+                <div className="font-semibold">BODY LENGTH</div>
+                <div>27</div>
+                <div>28</div>
+                <div>29</div>
+                <div>30</div>
+                <div>31¾</div>
+                <div>32¾</div>
+
+                <div className="font-semibold">CHEST</div>
+                <div>21</div>
+                <div>22</div>
+                <div>23</div>
+                <div>24</div>
+                <div>25¾</div>
+                <div>27½</div>
+
+                <div className="font-semibold">SLEEVE LENGTH</div>
+                <div>32</div>
+                <div>33</div>
+                <div>34</div>
+                <div>35</div>
+                <div>36</div>
+                <div>37</div>
               </div>
-              <div className="product-single__reviews-item">
-                <div className="customer-avatar">
-                  <img
-                    loading="lazy"
-                    src="https://uomo-html.flexkitux.com/images/avatar.jpg"
-                    alt=""
-                  />
-                </div>
-                <div className="customer-review">
-                  <div className="customer-name">
-                    <h6>Benjam Porter</h6>
-                    <div className="reviews-group d-flex">
-                      <svg
-                        className="review-star"
-                        viewBox="0 0 9 9"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg
-                        className="review-star"
-                        viewBox="0 0 9 9"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg
-                        className="review-star"
-                        viewBox="0 0 9 9"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg
-                        className="review-star"
-                        viewBox="0 0 9 9"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg
-                        className="review-star"
-                        viewBox="0 0 9 9"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <use href="#icon_star" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="review-date">April 06, 2023</div>
-                  <div className="review-text">
-                    <p>
-                      Nam libero tempore, cum soluta nobis est eligendi optio
-                      cumque nihil impedit quo minus id quod maxime placeat
-                      facere possimus, omnis voluptas assumenda est…
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="product-single__review-form">
-              <form name="customer-review-form">
-                <h5>Be the first to review “Message Cotton T-Shirt”</h5>
-                <p>
-                  Your email address will not be published. Required fields are
-                  marked *
-                </p>
-                <div className="select-star-rating">
-                  <label>Your rating *</label>
-                  <span className="star-rating">
-                    <svg
-                      className="star-rating__star-icon"
-                      width={12}
-                      height={12}
-                      fill="#ccc"
-                      viewBox="0 0 12 12"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M11.1429 5.04687C11.1429 4.84598 10.9286 4.76562 10.7679 4.73884L7.40625 4.25L5.89955 1.20312C5.83929 1.07589 5.72545 0.928571 5.57143 0.928571C5.41741 0.928571 5.30357 1.07589 5.2433 1.20312L3.73661 4.25L0.375 4.73884C0.207589 4.76562 0 4.84598 0 5.04687C0 5.16741 0.0870536 5.28125 0.167411 5.3683L2.60491 7.73884L2.02902 11.0871C2.02232 11.1339 2.01563 11.1741 2.01563 11.221C2.01563 11.3951 2.10268 11.5558 2.29688 11.5558C2.39063 11.5558 2.47768 11.5223 2.56473 11.4754L5.57143 9.89509L8.57813 11.4754C8.65848 11.5223 8.75223 11.5558 8.84598 11.5558C9.04018 11.5558 9.12054 11.3951 9.12054 11.221C9.12054 11.1741 9.12054 11.1339 9.11384 11.0871L8.53795 7.73884L10.9688 5.3683C11.0558 5.28125 11.1429 5.16741 11.1429 5.04687Z" />
-                    </svg>
-                    <svg
-                      className="star-rating__star-icon"
-                      width={12}
-                      height={12}
-                      fill="#ccc"
-                      viewBox="0 0 12 12"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M11.1429 5.04687C11.1429 4.84598 10.9286 4.76562 10.7679 4.73884L7.40625 4.25L5.89955 1.20312C5.83929 1.07589 5.72545 0.928571 5.57143 0.928571C5.41741 0.928571 5.30357 1.07589 5.2433 1.20312L3.73661 4.25L0.375 4.73884C0.207589 4.76562 0 4.84598 0 5.04687C0 5.16741 0.0870536 5.28125 0.167411 5.3683L2.60491 7.73884L2.02902 11.0871C2.02232 11.1339 2.01563 11.1741 2.01563 11.221C2.01563 11.3951 2.10268 11.5558 2.29688 11.5558C2.39063 11.5558 2.47768 11.5223 2.56473 11.4754L5.57143 9.89509L8.57813 11.4754C8.65848 11.5223 8.75223 11.5558 8.84598 11.5558C9.04018 11.5558 9.12054 11.3951 9.12054 11.221C9.12054 11.1741 9.12054 11.1339 9.11384 11.0871L8.53795 7.73884L10.9688 5.3683C11.0558 5.28125 11.1429 5.16741 11.1429 5.04687Z" />
-                    </svg>
-                    <svg
-                      className="star-rating__star-icon"
-                      width={12}
-                      height={12}
-                      fill="#ccc"
-                      viewBox="0 0 12 12"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M11.1429 5.04687C11.1429 4.84598 10.9286 4.76562 10.7679 4.73884L7.40625 4.25L5.89955 1.20312C5.83929 1.07589 5.72545 0.928571 5.57143 0.928571C5.41741 0.928571 5.30357 1.07589 5.2433 1.20312L3.73661 4.25L0.375 4.73884C0.207589 4.76562 0 4.84598 0 5.04687C0 5.16741 0.0870536 5.28125 0.167411 5.3683L2.60491 7.73884L2.02902 11.0871C2.02232 11.1339 2.01563 11.1741 2.01563 11.221C2.01563 11.3951 2.10268 11.5558 2.29688 11.5558C2.39063 11.5558 2.47768 11.5223 2.56473 11.4754L5.57143 9.89509L8.57813 11.4754C8.65848 11.5223 8.75223 11.5558 8.84598 11.5558C9.04018 11.5558 9.12054 11.3951 9.12054 11.221C9.12054 11.1741 9.12054 11.1339 9.11384 11.0871L8.53795 7.73884L10.9688 5.3683C11.0558 5.28125 11.1429 5.16741 11.1429 5.04687Z" />
-                    </svg>
-                    <svg
-                      className="star-rating__star-icon"
-                      width={12}
-                      height={12}
-                      fill="#ccc"
-                      viewBox="0 0 12 12"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M11.1429 5.04687C11.1429 4.84598 10.9286 4.76562 10.7679 4.73884L7.40625 4.25L5.89955 1.20312C5.83929 1.07589 5.72545 0.928571 5.57143 0.928571C5.41741 0.928571 5.30357 1.07589 5.2433 1.20312L3.73661 4.25L0.375 4.73884C0.207589 4.76562 0 4.84598 0 5.04687C0 5.16741 0.0870536 5.28125 0.167411 5.3683L2.60491 7.73884L2.02902 11.0871C2.02232 11.1339 2.01563 11.1741 2.01563 11.221C2.01563 11.3951 2.10268 11.5558 2.29688 11.5558C2.39063 11.5558 2.47768 11.5223 2.56473 11.4754L5.57143 9.89509L8.57813 11.4754C8.65848 11.5223 8.75223 11.5558 8.84598 11.5558C9.04018 11.5558 9.12054 11.3951 9.12054 11.221C9.12054 11.1741 9.12054 11.1339 9.11384 11.0871L8.53795 7.73884L10.9688 5.3683C11.0558 5.28125 11.1429 5.16741 11.1429 5.04687Z" />
-                    </svg>
-                    <svg
-                      className="star-rating__star-icon"
-                      width={12}
-                      height={12}
-                      fill="#ccc"
-                      viewBox="0 0 12 12"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M11.1429 5.04687C11.1429 4.84598 10.9286 4.76562 10.7679 4.73884L7.40625 4.25L5.89955 1.20312C5.83929 1.07589 5.72545 0.928571 5.57143 0.928571C5.41741 0.928571 5.30357 1.07589 5.2433 1.20312L3.73661 4.25L0.375 4.73884C0.207589 4.76562 0 4.84598 0 5.04687C0 5.16741 0.0870536 5.28125 0.167411 5.3683L2.60491 7.73884L2.02902 11.0871C2.02232 11.1339 2.01563 11.1741 2.01563 11.221C2.01563 11.3951 2.10268 11.5558 2.29688 11.5558C2.39063 11.5558 2.47768 11.5223 2.56473 11.4754L5.57143 9.89509L8.57813 11.4754C8.65848 11.5223 8.75223 11.5558 8.84598 11.5558C9.04018 11.5558 9.12054 11.3951 9.12054 11.221C9.12054 11.1741 9.12054 11.1339 9.11384 11.0871L8.53795 7.73884L10.9688 5.3683C11.0558 5.28125 11.1429 5.16741 11.1429 5.04687Z" />
-                    </svg>
-                  </span>
-                  <input type="hidden" id="form-input-rating" defaultValue />
-                </div>
-                <div className="mb-4">
-                  <textarea
-                    id="form-input-review"
-                    className="form-control form-control_gray"
-                    placeholder="Your Review"
-                    cols={30}
-                    rows={8}
-                    defaultValue={""}
-                  />
-                </div>
-                <div className="form-label-fixed mb-4">
-                  <label htmlFor="form-input-name" className="form-label">
-                    Name *
-                  </label>
-                  <input
-                    id="form-input-name"
-                    className="form-control form-control-md form-control_gray"
-                  />
-                </div>
-                <div className="form-label-fixed mb-4">
-                  <label htmlFor="form-input-email" className="form-label">
-                    Email address *
-                  </label>
-                  <input
-                    id="form-input-email"
-                    className="form-control form-control-md form-control_gray"
-                  />
-                </div>
-                <div className="form-check mb-4">
-                  <input
-                    className="form-check-input form-check-input_fill"
-                    type="checkbox"
-                    defaultValue
-                    id="remember_checkbox"
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor="remember_checkbox"
-                  >
-                    Save my name, email, and website in this browser for the
-                    next time I comment.
-                  </label>
-                </div>
-                <div className="form-action">
-                  <button type="submit" className="btn btn-primary">
-                    Submit
-                  </button>
-                </div>
-              </form>
             </div>
           </div>
         </div>
       </div>
-      .
     </div>
   );
 }

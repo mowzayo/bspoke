@@ -17,3 +17,17 @@ export const products = [
       return products.find(product => product.id === id);
   }
   
+
+  /*
+  export const getProductById = async (id) => {
+  try {
+    const response = await fetch(`http://localhost:5000/api/products/${id}`);
+    if (!response.ok) throw new Error('Product not found');
+    const product = await response.json();
+    return product;
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return null;
+  }
+};
+*/

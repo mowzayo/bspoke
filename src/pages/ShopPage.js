@@ -1,16 +1,30 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "swiper/swiper-bundle.css"; // Ensure Swiper styles are imported
-import { products } from "./Utils"; // Adjust path as needed
-//import { useCart } from '../CartContext';
-//import { useWishlist } from '../WishlistContext';
-import "./ShopPage.css"; // New CSS file for custom styles
-import bvideo from "../assets/bvideo.mp4"; // Make sure the extension matches your file type
+import "swiper/swiper-bundle.css";
+import { useCart } from "../CartContext"; // Integrated for wishlist
+import "./ShopPage.css";
+import bvideo from "../assets/bvideo.mp4";
 import WishlistButton from "./WishlistButton";
 
 function ShopPage() {
-  //const { addToCart } = useCart();
-  // const { addToWishlist } = useWishlist();
+  const [products, setProducts] = useState([]);
+  const { addToWishlist } = useCart(); // For wishlist functionality
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/products");
+      if (!response.ok) throw new Error("Failed to fetch products");
+      const data = await response.json();
+      console.log("Fetched products:", data);
+      setProducts(data);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  };
 
   return (
     <div className="shop-page">
@@ -186,7 +200,7 @@ function ShopPage() {
 
         {/* Main Content */}
         <div className="shop-list flex-grow-1">
-          {/* Slideshow (unchanged) */}
+          {/* Slideshow */}
           <div
             className="swiper-container js-swiper-slider slideshow slideshow_small"
             data-settings='{"autoplay": {"delay": 5000}, "slidesPerView": 1, "effect": "fade", "loop": true, "pagination": {"el": ".slideshow-pagination", "type": "bullets", "clickable": true}}'
@@ -194,10 +208,15 @@ function ShopPage() {
             <div className="swiper-wrapper">
               <div className="swiper-slide">
                 <div
-                  className="overflow-hidden position-relative h-100"
+                  className="overflow-hidden position-relative h-48 md:h-64"
                   style={{ backgroundColor: "#eee" }}
                 >
-                  <video autoPlay loop muted className="w-100 h-100">
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    className="w-full h-full object-cover"
+                  >
                     <source src={bvideo} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
@@ -220,7 +239,7 @@ function ShopPage() {
               </div>
               <div className="swiper-slide">
                 <div
-                  className="overflow-hidden position-relative h-100"
+                  className="overflow-hidden position-relative h-48 md:h-64"
                   style={{ backgroundColor: "#eee" }}
                 >
                   <div className="slideshow-character position-absolute bottom-0 pos_right-center">
@@ -282,33 +301,36 @@ function ShopPage() {
           <div className="mb-3 pb-2 pb-xl-3" />
 
           {/* Product Grid */}
-          <div className="product-grid">
+          <div className="product-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => (
-              <div className="product-card-wrapper" key={product.id}>
+              <div className="product-card-wrapper" key={product._id}>
                 <div className="product-card mb-3 mb-md-4 mb-xxl-5">
-                  <div className="pc__img-wrapper">
+                  <div className="pc__img-wrapper relative">
                     <div className="swiper-container background-img js-swiper-slider">
                       <div className="swiper-wrapper">
                         <div className="swiper-slide">
-                          <Link to={`/item/${product.id}`}>
+                          <Link to={`/item/${product._id}`}>
                             <img
                               loading="lazy"
-                              src={product.image}
+                              src={
+                                Array.isArray(product.images) &&
+                                product.images.length > 0
+                                  ? product.images[0]
+                                  : ""
+                              }
                               alt={product.name}
-                              className="pc__img"
+                              className="pc__img w-full h-64 object-cover"
                             />
                           </Link>
                         </div>
-                        {product.altImage && (
+                        {product.images && product.images[1] && (
                           <div className="swiper-slide">
-                            <Link to={`/item/${product.id}`}>
+                            <Link to={`/item/${product._id}`}>
                               <img
                                 loading="lazy"
-                                src={product.altImage}
-                                width={330}
-                                height={400}
-                                alt={product.name}
-                                className="pc__img"
+                                src={product.images[1]}
+                                alt={`${product.name} alt`}
+                                className="pc__img w-full h-64 object-cover"
                               />
                             </Link>
                           </div>
@@ -325,18 +347,12 @@ function ShopPage() {
                         </svg>
                       </span>
                     </div>
-
-                    <button
-                      className="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium"
-                      onClick={() => {
-                        // addToCart(product);
-                        document.body.style.overflow = "auto";
-                      }}
+                    <Link
+                      to={`/item/${product._id}`}
+                      className="view-page absolute inset-0 flex items-center justify-center text-white bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-200 text-sm font-medium"
                     >
-                      <Link to={`/item/${product.id}`} className="view-link">
-                        View
-                      </Link>
-                    </button>
+                      View Page
+                    </Link>
                   </div>
 
                   <div className="pc__info">
@@ -346,25 +362,17 @@ function ShopPage() {
                       <div className="product-card__price d-flex">
                         {product.oldPrice && (
                           <span className="money price price-old">
-                            ${product.oldPrice}
+                            ₦{product.oldPrice}
                           </span>
                         )}
                         <span className="money price price-sale">
-                          ${product.price}
+                          ₦{product.price}
                         </span>
                       </div>
                     </div>
                     <h6 className="pc__title">
-                      <Link to={`/item/${product.id}`}>{product.name}</Link>
+                      <Link to={`/item/${product._id}`}>{product.name}</Link>
                     </h6>
-
-                    {/*}
-                    <button
-                      className="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0"
-                      onClick={() => addToWishlist(product)}
-                    >
-                      <svg width={16} height={16} viewBox="0 0 20 20" fill="none"><use href="#icon_heart" /></svg>
-                    </button>*/}
                   </div>
                 </div>
               </div>

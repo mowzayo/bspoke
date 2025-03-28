@@ -85,7 +85,7 @@
 }
 .nav-link_underscore {
   cursor: pointer; /* Make headers look clickable */
-  color: black;
+  color: rgb(6, 5, 5);
 }
 .block-title {
   font-size: 1.5rem;
@@ -103,15 +103,73 @@
   display: flex;
   margin-bottom: 1.5rem;
 }
-.customer-avatar img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-right: 1rem;
+
+.size-guide {
+  max-width: 800px; /* Adjust width as needed */
+  margin: 20px auto; /* Centering */
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
-.review-star {
-  width: 12px;
-  height: 12px;
-  fill: #f5c518;
-  margin-right: 2px;
+
+.size-guide h3 {
+  font-size: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+  color: #333;
+}
+
+.size-guide .grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 columns */
+  gap: 8px;
+  text-align: center;
+  align-items: center;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.size-guide .grid div {
+  padding: 8px;
+  border: 1px solid #ddd; /* Border for better visibility */
+  background: #f9f9f9;
+  font-size: 14px;
+}
+
+.size-guide .grid .font-semibold {
+  font-weight: bold;
+  background: #ddd; /* Light gray background for headers */
+}
+
+@media (max-width: 1064px) {
+  .size-guide {
+    max-width: 100%; /* Full width */
+    margin: 5px auto; /* Further reduced margin (from 10px) */
+    padding: 5px; /* Further reduced padding (from 15px) */
+  }
+
+  .size-guide h3 {
+    font-size: 1rem; /* Even smaller heading (from 1.25rem to 16px) */
+  }
+
+  .size-guide .grid {
+    grid-template-columns: repeat(7, 1fr); /* Reduce to 3 columns (from 4) */
+    gap: 1px; /* Tighter gap (from 4px) */
+    padding: 5px; /* Further reduced padding (from 8px) */
+    overflow-x: auto; /* Keep horizontal scrolling */
+    min-width: 0; /* Prevent grid overflow */
+  }
+
+  .size-guide .grid div {
+    padding: 4px; /* Tighter padding (from 6px) */
+    font-size: 10px; /* Smaller text (from 12px) */
+    min-width: 0; /* Allow cells to shrink */
+    overflow: hidden; /* Prevent text overflow */
+  }
+
+  .size-guide .grid .font-semibold {
+    font-size: 7px; /* Match smaller text */
+    padding: 2px; /* Consistent with other cells */
+  }
 }

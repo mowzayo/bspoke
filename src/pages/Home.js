@@ -73,7 +73,7 @@ function Home() {
                 <WishlistButton product={product} />{" "}
                 {/* ✅ Pass full product object */}
                 {/* Link to the Shop Page with the product ID */}
-                <button>
+                <button className="vie">
                   {" "}
                   <Link to={`/item/${product.id}`} className="view-details">
                     View
