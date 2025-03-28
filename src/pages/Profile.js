@@ -7,6 +7,8 @@ function Profile() {
   const { user, cart, wishlist, logout } = useCart();
   const navigate = useNavigate();
 
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   const [orders, setOrders] = useState([]);
   const [address, setAddress] = useState({ street: "", city: "", zip: "" });
   const [card, setCard] = useState({ number: "", expiry: "", cvv: "" });
@@ -24,7 +26,7 @@ function Profile() {
   const fetchProfileData = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/auth/profile", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to fetch profile data");
@@ -42,15 +44,12 @@ function Profile() {
 
   const saveAddress = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/profile/address",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(address),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/auth/profile/address`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(address),
+      });
       if (!response.ok) throw new Error("Failed to save address");
       alert("Address saved successfully!");
     } catch (err) {
@@ -61,15 +60,12 @@ function Profile() {
 
   const saveCard = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/profile/card",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(card),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/auth/profile/card`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(card),
+      });
       if (!response.ok) throw new Error("Failed to save card");
       alert("Card saved successfully!");
     } catch (err) {

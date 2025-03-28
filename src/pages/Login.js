@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../CartContext";
-/*import logo from "../assets/blg.png"; // Adjust path to your logo */
-import googleIcon from "../assets/google.png"; // Adjust path
-import emailIcon from "../assets/email.png"; // Adjust path
-import mockImage from "../assets/blg.png"; // Adjust path
-import pass from "../assets/padlock.png"; // Adjust path
-import user from "../assets/user.png"; // Adjust path
-import "./Login.css"; // We'll create this file based on your CSS
+import googleIcon from "../assets/google.png";
+import emailIcon from "../assets/email.png";
+import mockImage from "../assets/blg.png";
+import pass from "../assets/padlock.png";
+import user from "../assets/user.png";
+import "./Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -17,6 +16,8 @@ function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
   const { login } = useCart();
+
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -34,7 +35,7 @@ function Login() {
     const payload = { username, email, password };
     console.log("Sending sign-up payload:", payload);
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -169,7 +170,7 @@ function Login() {
       <div className="info-side">
         <img src={mockImage} alt="Mock" className="mockup" aria-hidden="true" />
         <div className="welcome-message">
-          <h2>BSPoke Shop!</h2> {/* Customized for your app */}
+          <h2>BSPoke Shop!</h2>
           <p>Your ultimate destination for unique, custom-made products.</p>
         </div>
       </div>
