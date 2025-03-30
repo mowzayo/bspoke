@@ -15,13 +15,15 @@ function ItemPage() {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
 
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000"; // Match CartContext
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          `http://localhost:5000/api/products/${productId}`
-        );
+        const response = await fetch(`${API_URL}/api/products/${productId}`, {
+          credentials: "include", // Add this for consistency with CartContext
+        });
         if (!response.ok) throw new Error("Failed to fetch product");
         const fetchedProduct = await response.json();
         console.log("Fetched product:", fetchedProduct);
@@ -33,7 +35,7 @@ function ItemPage() {
       }
     };
     fetchProduct();
-  }, [productId]);
+  }, [productId, API_URL]); // Add API_URL to dependencies
 
   const handleSizeSelect = (size) => {
     if (selectedSize !== size) {
