@@ -1,4 +1,3 @@
-// src/pages/Dashboard.js
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
@@ -16,20 +15,35 @@ function Dashboard() {
   const [editId, setEditId] = useState(null);
   const navigate = useNavigate();
 
-  // Check session and load products
+  // Check JWT token and load products
   useEffect(() => {
     const checkSession = async () => {
+      const token = localStorage.getItem("token");
+      console.log("Dashboard - Token from localStorage:", token); // Debug token presence
+      if (!token) {
+        console.log("No token found, redirecting to login");
+        navigate("/login");
+        return;
+      }
+
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/auth/check-session",
-          {
-            credentials: "include", // Send session cookie
-          }
-        );
-        if (!response.ok) throw new Error("Not logged in");
+        console.log("Verifying token with /api/auth/verify..."); // Debug fetch start
+        const response = await fetch("http://localhost:5000/api/auth/verify", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log("Verify response status:", response.status); // Debug response status
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Verification failed: ${response.status} - ${errorText}`
+          );
+        }
         const { user } = await response.json();
+        console.log("Verified user:", user); // Debug user data
         if (!user.isAdmin) {
-          console.log("User is not an admin:", user);
+          console.log("User is not an admin, redirecting to home");
           navigate("/");
           return;
         }
@@ -38,7 +52,9 @@ function Dashboard() {
         const productResponse = await fetch(
           "http://localhost:5000/api/products",
           {
-            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         if (!productResponse.ok) throw new Error("Unauthorized");
@@ -46,7 +62,7 @@ function Dashboard() {
         console.log("Initial products fetched:", data);
         setProducts(data);
       } catch (err) {
-        console.error("Session check error:", err);
+        console.error("Session check error:", err.message); // Debug error details
         navigate("/login");
       }
     };
@@ -54,9 +70,12 @@ function Dashboard() {
   }, [navigate]);
 
   const fetchProducts = async () => {
+    const token = localStorage.getItem("token");
     try {
       const response = await fetch("http://localhost:5000/api/products", {
-        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (!response.ok) throw new Error("Failed to fetch products");
       const data = await response.json();
@@ -78,6 +97,7 @@ function Dashboard() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Add Product button clicked");
+    const token = localStorage.getItem("token");
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
     formDataToSend.append("price", Number(formData.price));
@@ -96,7 +116,9 @@ function Dashboard() {
     try {
       const response = await fetch(url, {
         method,
-        credentials: "include", // Send session cookie
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formDataToSend,
       });
       console.log("Response status:", response.status);
@@ -125,10 +147,13 @@ function Dashboard() {
 
   const handleDelete = async (id) => {
     console.log("Delete button clicked for ID:", id);
+    const token = localStorage.getItem("token");
     try {
       const response = await fetch(`http://localhost:5000/api/products/${id}`, {
         method: "DELETE",
-        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       console.log("Delete response status:", response.status);
       const responseText = await response.text();
@@ -142,21 +167,15 @@ function Dashboard() {
   };
 
   const handleLogout = async () => {
-    try {
-      await fetch("http://localhost:5000/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
     <div className="dashboard">
       <h1>Admin Dashboard</h1>
-
+      <button onClick={handleLogout}>Logout</button>{" "}
+      {/* Added to use handleLogout */}
       <form
         onSubmit={handleSubmit}
         className="product-form"
@@ -202,7 +221,6 @@ function Dashboard() {
           {editId ? "Update Product" : "Add Product"}
         </button>
       </form>
-
       <h2>Products</h2>
       <table>
         <thead className="the">
