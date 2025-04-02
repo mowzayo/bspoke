@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+console.log("CartContext API_URL:", API_URL);
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
@@ -8,14 +9,25 @@ export const CartProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState({ items: [] });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
 
   useEffect(() => {
     const fetchUserData = async () => {
+      if (!token) {
+        setCart(JSON.parse(localStorage.getItem("cart")) || []);
+        setWishlist({
+          items: JSON.parse(localStorage.getItem("wishlist")) || [],
+        });
+        setUser(null);
+        setIsLoggedIn(false);
+        return;
+      }
+
       try {
         const sessionResponse = await fetch(
           `${API_URL}/api/auth/check-session`,
           {
-            credentials: "include",
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
         if (sessionResponse.ok) {
@@ -30,8 +42,10 @@ export const CartProvider = ({ children }) => {
             for (const item of localWishlist) {
               await fetch(`${API_URL}/api/wishlist/add`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
                 body: JSON.stringify({ productId: item.productId._id }),
               });
             }
@@ -39,7 +53,7 @@ export const CartProvider = ({ children }) => {
           }
 
           const wishlistResponse = await fetch(`${API_URL}/api/wishlist`, {
-            credentials: "include",
+            headers: { Authorization: `Bearer ${token}` },
           });
           if (!wishlistResponse.ok) {
             console.warn(
@@ -50,13 +64,10 @@ export const CartProvider = ({ children }) => {
             throw new Error("Failed to fetch wishlist");
           }
           const wishlistData = await wishlistResponse.json();
-          const normalizedWishlist = {
-            items: Array.isArray(wishlistData.items)
-              ? wishlistData.items
-              : wishlistData.items?.items || [],
-          };
-          setWishlist(normalizedWishlist);
+          setWishlist({ items: wishlistData.items || [] });
         } else {
+          setToken(null);
+          localStorage.removeItem("token");
           setCart(JSON.parse(localStorage.getItem("cart")) || []);
           setWishlist({
             items: JSON.parse(localStorage.getItem("wishlist")) || [],
@@ -66,6 +77,8 @@ export const CartProvider = ({ children }) => {
         }
       } catch (err) {
         console.error("Error fetching user data:", err);
+        setToken(null);
+        localStorage.removeItem("token");
         setCart(JSON.parse(localStorage.getItem("cart")) || []);
         setWishlist({
           items: JSON.parse(localStorage.getItem("wishlist")) || [],
@@ -75,15 +88,14 @@ export const CartProvider = ({ children }) => {
       }
     };
     fetchUserData();
-  }, []);
+  }, [token]);
 
-  // Debounce local storage updates to prevent rapid firing
   useEffect(() => {
     if (!isLoggedIn) {
       const timeout = setTimeout(() => {
         localStorage.setItem("cart", JSON.stringify(cart));
         localStorage.setItem("wishlist", JSON.stringify(wishlist.items));
-      }, 500); // 500ms debounce
+      }, 500);
       return () => clearTimeout(timeout);
     }
   }, [cart, wishlist, isLoggedIn]);
@@ -93,8 +105,10 @@ export const CartProvider = ({ children }) => {
     try {
       const response = await fetch(`${API_URL}/api/auth/cart`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ productId: id, size, quantity }),
       });
       const data = await response.json();
@@ -129,8 +143,10 @@ export const CartProvider = ({ children }) => {
       );
       const response = await fetch(`${API_URL}/api/auth/cart`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           productId,
           size,
@@ -158,8 +174,10 @@ export const CartProvider = ({ children }) => {
       const quantityDiff = newQuantity - currentItem.quantity;
       const response = await fetch(`${API_URL}/api/auth/cart`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ productId, size, quantity: quantityDiff }),
       });
       const data = await response.json();
@@ -182,8 +200,10 @@ export const CartProvider = ({ children }) => {
     try {
       const response = await fetch(`${API_URL}/api/auth/cart`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ clear: true }),
       });
       const data = await response.json();
@@ -200,8 +220,10 @@ export const CartProvider = ({ children }) => {
       if (isLoggedIn) {
         const response = await fetch(`${API_URL}/api/wishlist/add`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ productId: product._id }),
         });
         if (!response.ok) {
@@ -245,8 +267,10 @@ export const CartProvider = ({ children }) => {
       if (isLoggedIn) {
         const response = await fetch(`${API_URL}/api/wishlist/remove`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ productId }),
         });
         if (!response.ok) {
@@ -267,28 +291,13 @@ export const CartProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-      if (response.ok) {
-        setCart([]);
-        setWishlist({ items: [] });
-        setUser(null);
-        setIsLoggedIn(false);
-        localStorage.removeItem("cart");
-      } else {
-        throw new Error("Logout failed");
-      }
-    } catch (err) {
-      console.error("Logout error:", err);
-      setCart([]);
-      setWishlist({ items: [] });
-      setUser(null);
-      setIsLoggedIn(false);
-      localStorage.removeItem("cart");
-    }
+    setToken(null);
+    localStorage.removeItem("token");
+    setCart([]);
+    setWishlist({ items: [] });
+    setUser(null);
+    setIsLoggedIn(false);
+    localStorage.removeItem("cart");
   };
 
   const login = async (email, password) => {
@@ -296,7 +305,6 @@ export const CartProvider = ({ children }) => {
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({
           email,
           password,
@@ -305,24 +313,18 @@ export const CartProvider = ({ children }) => {
         }),
       });
       const data = await response.json();
+      console.log("Login response from server:", data);
       if (!response.ok) throw new Error(data.message || "Login failed");
 
-      const sessionResponse = await fetch(`${API_URL}/api/auth/check-session`, {
-        credentials: "include",
-      });
-      if (sessionResponse.ok) {
-        const sessionData = await sessionResponse.json();
-        setCart(sessionData.cart || []);
-        setUser(sessionData.user);
-        setIsLoggedIn(true);
-
-        const wishlistResponse = await fetch(`${API_URL}/api/wishlist`, {
-          credentials: "include",
-        });
-        if (!wishlistResponse.ok) throw new Error("Failed to fetch wishlist");
-        const wishlistData = await wishlistResponse.json();
-        setWishlist({ items: wishlistData.items || [] });
-      }
+      setToken(data.token);
+      localStorage.setItem("token", data.token);
+      setUser(data.user);
+      setIsLoggedIn(true);
+      setCart(data.cart || []);
+      setWishlist({ items: data.wishlist || [] });
+      console.log("Token set:", data.token);
+      console.log("User set:", data.user);
+      console.log("isLoggedIn set:", true);
       return true;
     } catch (err) {
       console.error("Login error:", err);

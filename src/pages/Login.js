@@ -15,17 +15,22 @@ function Login() {
   const [error, setError] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
-  const { login } = useCart();
+  const { login, user } = useCart(); // Move useCart to top level
 
   const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  console.log("Login API_BASE_URL:", API_BASE_URL);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Sending payload:", { email, password });
+    console.log("Sending login payload:", { email, password });
     try {
-      await login(email, password);
+      const success = await login(email, password);
+      console.log("Login success:", success);
+      console.log("User after login:", user); // Use the user from useCart
+      console.log("Token in localStorage:", localStorage.getItem("token"));
       navigate("/");
     } catch (err) {
+      console.error("Login error:", err.message);
       setError(err.message);
     }
   };
@@ -42,6 +47,9 @@ function Login() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Sign-up failed");
+
+      // Auto-login after signup
+      localStorage.setItem("token", data.token);
       navigate("/");
     } catch (err) {
       console.error("Sign-up error:", err);
