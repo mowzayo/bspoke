@@ -15,6 +15,8 @@ function Dashboard() {
   const [editId, setEditId] = useState(null);
   const navigate = useNavigate();
 
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000"; // Use env variable
+
   // Check JWT token and load products
   useEffect(() => {
     const checkSession = async () => {
@@ -28,7 +30,7 @@ function Dashboard() {
 
       try {
         console.log("Verifying token with /api/auth/verify..."); // Debug fetch start
-        const response = await fetch("http://localhost:5000/api/auth/verify", {
+        const response = await fetch(`${API_URL}/api/auth/verify`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -49,14 +51,11 @@ function Dashboard() {
         }
 
         // Fetch products
-        const productResponse = await fetch(
-          "http://localhost:5000/api/products",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const productResponse = await fetch(`${API_URL}/api/products`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!productResponse.ok) throw new Error("Unauthorized");
         const data = await productResponse.json();
         console.log("Initial products fetched:", data);
@@ -67,12 +66,12 @@ function Dashboard() {
       }
     };
     checkSession();
-  }, [navigate]);
+  }, [navigate, API_URL]); // Add API_URL to dependencies
 
   const fetchProducts = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch("http://localhost:5000/api/products", {
+      const response = await fetch(`${API_URL}/api/products`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -110,8 +109,8 @@ function Dashboard() {
 
     const method = editId ? "PUT" : "POST";
     const url = editId
-      ? `http://localhost:5000/api/products/${editId}`
-      : "http://localhost:5000/api/products";
+      ? `${API_URL}/api/products/${editId}`
+      : `${API_URL}/api/products`;
 
     try {
       const response = await fetch(url, {
@@ -149,7 +148,7 @@ function Dashboard() {
     console.log("Delete button clicked for ID:", id);
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const response = await fetch(`${API_URL}/api/products/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
