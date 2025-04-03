@@ -18,8 +18,11 @@ function ShopPage() {
     try {
       const API_BASE_URL =
         process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const token = localStorage.getItem("token"); // Get JWT from localStorage
       const response = await fetch(`${API_BASE_URL}/api/products`, {
-        credentials: "include", // Added to support session cookies
+        headers: {
+          Authorization: `Bearer ${token}`, // Switch to JWT
+        },
       });
       if (!response.ok) throw new Error("Failed to fetch products");
       const data = await response.json();
