@@ -21,8 +21,11 @@ function ItemPage() {
     const fetchProduct = async () => {
       try {
         setLoading(true);
+        const token = localStorage.getItem("token"); // Get JWT from localStorage
         const response = await fetch(`${API_URL}/api/products/${productId}`, {
-          credentials: "include", // Add this for consistency with CartContext
+          headers: {
+            Authorization: `Bearer ${token}`, // Add JWT header
+          },
         });
         if (!response.ok) throw new Error("Failed to fetch product");
         const fetchedProduct = await response.json();
