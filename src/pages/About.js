@@ -1,4 +1,6 @@
 import React from "react";
+import header from "../assets/header.jpg";
+import header1 from "../assets/header1.jpg";
 
 function About() {
   return (
@@ -12,7 +14,7 @@ function About() {
             <img
               loading="lazy"
               className="w-100 h-auto d-block"
-              src="https://uomo-html.flexkitux.com/images/about/about-1.jpg"
+              src={header}
               width={1410}
               height={550}
               alt=""
@@ -49,7 +51,7 @@ function About() {
               <img
                 className="h-auto"
                 loading="lazy"
-                src="https://uomo-html.flexkitux.com/images/about/about-2.jpg"
+                src={header1}
                 width={450}
                 height={500}
                 alt=""
