@@ -9,6 +9,7 @@
 .profil-icon {
   background: none; /* Removes default background */
   border: none; /* Removes default border */
+
   padding: 0; /* Removes extra spacing */
   cursor: pointer; /* Ensures it's clickable */
   outline: none; /* Removes focus outline */
@@ -20,6 +21,11 @@
   box-shadow: none; /* Removes any shadow */
 }
 
+.shows {
+  border: none;
+  background: grey;
+  color: #ccc;
+}
 .profil-container {
   position: relative;
 }
@@ -27,31 +33,18 @@
 .profil-dropdown {
   position: absolute;
   flex-direction: column;
+  top: 40px;
   right: 0;
-  margin-top: 1px;
   border-radius: 6px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-  font-weight: bold;
+  z-index: 10;
 }
 
-.profil-dropdown a,
-.profil-dropdown button {
+.profil-dropdown .shows {
   display: block;
   width: 100%;
   text-align: center;
   padding: 7px 0;
-  border-bottom: 1px solid #666464;
-}
-
-.profil-dropdown a:last-child,
-.profil-dropdown button:last-child {
-  border-bottom: none;
-}
-
-.blockk {
-  background-color: grey;
-  color: white;
 }
 
 .navbar-container {
@@ -219,7 +212,7 @@
   border-radius: 5px;
 }
 
-@media (max-width: 1336px) {
+@media (max-width: 1024px) {
   .navbar {
     padding: 1rem;
     position: relative;
@@ -264,7 +257,7 @@
   }
 
   .profil-icon {
-    margin-bottom: 20px;
+    margin-bottom: 35px;
     width: 20px;
   }
 
@@ -298,9 +291,25 @@
   .nav-link:hover {
     background-color: #555;
   }
+  .profil-dropdown {
+    position: absolute;
+    right: 0;
+    border-radius: 6px;
+    box-shadow: 1 6px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    background: white; /* optional: ensure visibility */
+    margin-bottom: 50px;
+  }
 
-  .profil-dropdown a:hover,
-  .profil-dropdown button:hover {
-    background-color: #656363; /* From local */
+  .profil-dropdown .shows {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 7px 0;
+  }
+
+  .profil-container {
+    position: relative;
+    display: inline-block;
   }
 }

@@ -59,7 +59,7 @@ body {
   border: none;
 }
 
-.product-form button {
+.product-form .submit {
   background: var(--primary);
   color: white;
   padding: 0.75rem 1.5rem;
@@ -72,7 +72,7 @@ body {
   width: 100%;
 }
 
-.product-form button:hover {
+.product-form .submit:hover {
   background: #3a5ecc; /* Slightly darker shade of --primary */
 }
 
@@ -116,7 +116,7 @@ tbody tr:hover {
   background: #f9f9f9; /* Light hover effect */
 }
 
-td button {
+td .submi {
   padding: 0.5rem 1rem;
   margin-right: 0.5rem;
   border: none;
@@ -126,23 +126,23 @@ td button {
   transition: background 0.3s ease;
 }
 
-td button:first-child {
+td .submi:first-child {
   /* Edit button */
   background: #28a745; /* Green */
   color: white;
 }
 
-td button:first-child:hover {
+td .submi:first-child:hover {
   background: #218838; /* Darker green */
 }
 
-td button:last-child {
+td .submi:last-child {
   /* Delete button */
   background: #dc3545; /* Red */
   color: white;
 }
 
-td button:last-child:hover {
+td .submi:last-child:hover {
   background: #c82333; /* Darker red */
 }
 
@@ -166,12 +166,16 @@ td button:last-child:hover {
     width: 40px; /* Smaller images on mobile */
   }
 
-  td button {
+  td .submi {
     padding: 0.4rem 0.8rem;
     font-size: 0.8rem;
     margin-bottom: 0.5rem; /* Stack buttons vertically */
     display: block;
     width: 100%;
+  }
+  .logout {
+    border-radius: none;
+    background-color: #c82333;
   }
 }
 

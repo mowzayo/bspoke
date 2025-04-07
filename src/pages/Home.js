@@ -22,10 +22,6 @@ function Home() {
 
   return (
     <div>
-      <div className="h4">
-        <h4>Welcome to Bspoke Store</h4>
-      </div>
-
       <div className="slideshow-container">
         <img src={header} alt="hed 1" className="slide" />
         <img src={header1} alt="hed 2" className="slide" />

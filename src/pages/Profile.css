@@ -1,4 +1,3 @@
-
 /* Main container */
 .profilee-container {
   max-width: 1000px;
@@ -143,7 +142,7 @@
 }
 
 .bgg-red-500 {
-  /*background: var(--error); */
+  background: red;
   color: white;
   padding: 0.75rem 1.5rem; /* Matches px-4 py-2 */
   border: none;
@@ -151,9 +150,6 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.3s ease,
-    transform 0.2s ease;
 }
 
 .bg-red-500:hover {

@@ -173,7 +173,6 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <h1>Admin Dashboard</h1>
-      <button onClick={handleLogout}>Logout</button>{" "}
       {/* Added to use handleLogout */}
       <form
         onSubmit={handleSubmit}
@@ -216,7 +215,7 @@ function Dashboard() {
           onChange={handleChange}
           placeholder="Sizes (e.g., S, M, L)"
         />
-        <button type="submit">
+        <button className="submit" type="submit">
           {editId ? "Update Product" : "Add Product"}
         </button>
       </form>
@@ -250,8 +249,13 @@ function Dashboard() {
                 )}
               </td>
               <td>
-                <button onClick={() => handleEdit(product)}>Edit</button>
-                <button onClick={() => handleDelete(product._id)}>
+                <button className="submi" onClick={() => handleEdit(product)}>
+                  Edit
+                </button>
+                <button
+                  className="submi"
+                  onClick={() => handleDelete(product._id)}
+                >
                   Delete
                 </button>
               </td>
@@ -259,6 +263,9 @@ function Dashboard() {
           ))}
         </tbody>
       </table>
+      <button className="logout" onClick={handleLogout}>
+        Logout
+      </button>{" "}
     </div>
   );
 }
