@@ -33,13 +33,11 @@ const Navbar = () => {
   const [timeoutId, setTimeoutId] = useState(null);
 
   const handleMouseEnter = () => {
-    if (timeoutId) clearTimeout(timeoutId);
-    setShowCart(true);
+    setShowCart((prev) => !prev); // Toggle showCart on click
   };
 
   const handleMouseLeave = () => {
-    const id = setTimeout(() => setShowCart(false), 300);
-    setTimeoutId(id);
+    // No action needed for click-based toggle
   };
 
   return (
@@ -58,8 +56,7 @@ const Navbar = () => {
         <div className="cart-container flex items-center space-x-4">
           <div
             className="cart-icon-wrapper relative"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            onClick={handleMouseEnter} // Changed to onClick
           >
             <button className="cart-icon">
               <FaShoppingCart size={20} />
@@ -69,11 +66,7 @@ const Navbar = () => {
             </button>
 
             {showCart && (
-              <div
-                className="cart-dropdown"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
+              <div className="cart-dropdown">
                 {cartItems.length > 0 ? (
                   <ul>
                     {cartItems.map((item) => {
@@ -139,14 +132,14 @@ const Navbar = () => {
                 <div className="profil-dropdown right-0">
                   <Link
                     to="/profile"
-                    className="blockk px-4"
+                    className="shows text-left px-4 "
                     onClick={() => setShowProfileDropdown(false)}
                   >
                     Profile
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="blockk text-left px-4 bg-grey"
+                    className="shows text-left px-4 "
                   >
                     Logout
                   </button>
