@@ -142,6 +142,10 @@
   background: #ddd; /* Light gray background for headers */
 }
 
+.cart-prompt {
+  display: inline;
+}
+
 @media (max-width: 1064px) {
   .size-guide {
     max-width: 100%; /* Full width */

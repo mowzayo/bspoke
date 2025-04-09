@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useCart } from "../CartContext";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import WishlistButton from "./WishlistButton";
 import "./ItemPage.css";
 
@@ -82,7 +82,7 @@ function ItemPage() {
       setTimeout(() => {
         setIsAddingToCart(false);
         setShowPrompt(false);
-      }, 2000);
+      }, 5000);
 
       document.body.style.overflow = "auto";
     },
@@ -199,16 +199,34 @@ function ItemPage() {
                 left: "50%",
                 width: "100%",
                 transform: "translateX(-50%)",
-                color: "green",
-                backgroundColor: "#d4edda",
+                color: "white", // Changed to white for the main text
+                backgroundColor: "grey", // Changed to grey
                 padding: "5px 10px",
                 borderRadius: "4px",
                 zIndex: 10,
                 textAlign: "center",
                 fontSize: "20px",
+                display: "flex", // Added to enable flexbox
+                justifyContent: "center", // Centers items horizontally
+                alignItems: "center", // Aligns items vertically
+                gap: "10px", // Adds space between text and link
+                fontSize: "24px", // Increased from 20px to 24px
+                fontWeight: "bold", // Added to make text bold
               }}
             >
               Added to Cart!
+              <Link
+                to="/cart"
+                className="view-cart"
+                style={{
+                  color: "white", // Matches the parent color
+                  textDecoration: "underline", // Makes it look clickable
+                  fontSize: "24px", // Increased from 20px to 24px
+                  fontWeight: "bold", // Added to make text bold
+                }}
+              >
+                View Cart
+              </Link>
             </div>
           )}
         </div>

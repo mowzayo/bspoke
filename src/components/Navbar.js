@@ -30,14 +30,17 @@ const Navbar = () => {
     setShowCart(false);
   };
 
-  const [timeoutId, setTimeoutId] = useState(null);
-
   const handleMouseEnter = () => {
     setShowCart((prev) => !prev); // Toggle showCart on click
   };
 
   const handleMouseLeave = () => {
     // No action needed for click-based toggle
+  };
+
+  const handleRemoveFromCart = (e, productId, size) => {
+    e.stopPropagation(); // Prevent click from bubbling up to parent
+    removeFromCart(productId, size);
   };
 
   return (
@@ -56,7 +59,7 @@ const Navbar = () => {
         <div className="cart-container flex items-center space-x-4">
           <div
             className="cart-icon-wrapper relative"
-            onClick={handleMouseEnter} // Changed to onClick
+            onClick={handleMouseEnter} // Toggle on click
           >
             <button className="cart-icon">
               <FaShoppingCart size={20} />
@@ -94,14 +97,13 @@ const Navbar = () => {
                             />
                             <span>{item.name}</span>
                             <span>
-                              ₦{(item.price * (item.quantity || 1)).toFixed(2)}{" "}
-                              {/* Changed $ to ₦ */}
+                              ₦{(item.price * (item.quantity || 1)).toFixed(2)}
                             </span>
                           </div>
                           <span
                             className="remove-btn"
-                            onClick={() =>
-                              removeFromCart(item.productId, item.size)
+                            onClick={(e) =>
+                              handleRemoveFromCart(e, item.productId, item.size)
                             }
                           >
                             X
