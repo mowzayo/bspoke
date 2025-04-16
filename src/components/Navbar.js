@@ -11,6 +11,22 @@ const Navbar = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const { cart, removeFromCart, isLoggedIn, user, logout } = useCart();
   const navigate = useNavigate();
+  const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
+
+  const toggleShopDropdown = (e) => {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
+    setIsShopDropdownOpen((prev) => {
+      console.log("Toggling Shop Dropdown. New state:", !prev); // Debug log
+      return !prev;
+    });
+  };
+
+  const closeShopDropdown = () => {
+    setIsShopDropdownOpen(false);
+    setMenuOpen(false);
+  };
 
   const cartItems = Array.isArray(cart) ? cart : [];
   const cartItemCount = cartItems.reduce(
@@ -31,7 +47,7 @@ const Navbar = () => {
   };
 
   const handleMouseEnter = () => {
-    setShowCart((prev) => !prev); // Toggle showCart on click
+    setShowCart((prev) => !prev);
   };
 
   const handleMouseLeave = () => {
@@ -39,7 +55,7 @@ const Navbar = () => {
   };
 
   const handleRemoveFromCart = (e, productId, size) => {
-    e.stopPropagation(); // Prevent click from bubbling up to parent
+    e.stopPropagation();
     removeFromCart(productId, size);
   };
 
@@ -59,7 +75,7 @@ const Navbar = () => {
         <div className="cart-container flex items-center space-x-4">
           <div
             className="cart-icon-wrapper relative"
-            onClick={handleMouseEnter} // Toggle on click
+            onClick={handleMouseEnter}
           >
             <button className="cart-icon">
               <FaShoppingCart size={20} />
@@ -73,14 +89,10 @@ const Navbar = () => {
                 {cartItems.length > 0 ? (
                   <ul>
                     {cartItems.map((item) => {
-                      console.log(
-                        "Navbar - Cart Item:",
-                        JSON.stringify(item, null, 2)
-                      );
                       const imageSrc =
-                        (item.images && item.images[0]) || // Online: server might return images array
-                        item.image || // Offline: saved image
-                        "/placeholder.jpg"; // Fallback
+                        (item.images && item.images[0]) ||
+                        item.image ||
+                        "/placeholder.jpg";
                       return (
                         <li
                           key={`${item.productId}-${item.size}`}
@@ -134,14 +146,14 @@ const Navbar = () => {
                 <div className="profil-dropdown right-0">
                   <Link
                     to="/profile"
-                    className="shows text-left px-4 "
+                    className="shows text-left px-4"
                     onClick={() => setShowProfileDropdown(false)}
                   >
                     Profile
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="shows text-left px-4 "
+                    className="shows text-left px-4"
                   >
                     Logout
                   </button>
@@ -156,13 +168,73 @@ const Navbar = () => {
         <Link to="/" className="nav-link" onClick={() => setMenuOpen(false)}>
           Home
         </Link>
-        <Link
-          to="/shop"
-          className="nav-link"
-          onClick={() => setMenuOpen(false)}
+        <div
+          className={`nav-link shop-dropdown ${
+            isShopDropdownOpen ? "open" : ""
+          }`}
+          onClick={toggleShopDropdown}
+          onMouseEnter={() => setIsShopDropdownOpen(true)}
+          onMouseLeave={() => setIsShopDropdownOpen(false)}
         >
-          Shop
-        </Link>
+          <span>
+            Shop
+            <svg
+              className={`dropdown-icon ${isShopDropdownOpen ? "rotate" : ""}`}
+              width="10"
+              height="6"
+              viewBox="0 0 10 6"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1 1L5 5L9 1"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          {isShopDropdownOpen && (
+            <div className="dropdown-menu">
+              <Link
+                to="/ShopMen"
+                className="dropdown-item"
+                onClick={closeShopDropdown}
+              >
+                Shop Men
+              </Link>
+              <Link
+                to="/ShopShirt"
+                className="dropdown-item"
+                onClick={closeShopDropdown}
+              >
+                Shirt
+              </Link>
+              <Link
+                to="/ShopPants"
+                className="dropdown-item"
+                onClick={closeShopDropdown}
+              >
+                Pants
+              </Link>
+              <Link
+                to="/kids"
+                className="dropdown-item"
+                onClick={closeShopDropdown}
+              >
+                Kids
+              </Link>
+              <Link
+                to="/shop"
+                className="dropdown-item"
+                onClick={closeShopDropdown}
+              >
+                All Products
+              </Link>
+            </div>
+          )}
+        </div>
         <Link
           to="/about"
           className="nav-link"

@@ -1,13 +1,15 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../CartContext";
 import "./CartCheckout.css";
 
 function CartCheckout() {
-  const location = useLocation(); // Get current URL
-  const { cart } = useCart();
+  const location = useLocation();
+  const { cart, clearCart } = useCart(); // Ensure clearCart is in CartContext
+  const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-  // Calculate subtotal
+  // Calculate totals
   const subtotal = cart.reduce((acc, item) => {
     const price = item.price
       ? parseFloat(item.price.toString().replace("₦", "").trim()) || 0
@@ -15,36 +17,87 @@ function CartCheckout() {
     const quantity = Number(item.quantity) || 1;
     return acc + price * quantity;
   }, 0);
-
-  // Calculate 5% VAT
   const vat = subtotal * 0.05;
-
-  // Calculate total (subtotal + VAT, assuming free shipping)
   const total = subtotal + vat;
 
-  // State for country dropdown
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("");
+  // Generate a unique order number
+  const generateOrderNumber = () => {
+    return `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  };
 
-  const countries = [
-    "Australia",
-    "Canada",
-    "United Kingdom",
-    "United States",
-    "Turkey",
-  ];
+  const handlePlaceOrder = async (e) => {
+    e.preventDefault();
 
-  // Filter countries based on search term
-  const filteredCountries = countries.filter((country) =>
-    country.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    const formData = new FormData(e.target);
+    const billingDetails = {
+      firstName: formData.get("checkout_first_name"),
+      lastName: formData.get("checkout_last_name"),
+      companyName: formData.get("checkout_company_name"),
+      country: formData.get("checkout_country"),
+      streetAddress: formData.get("checkout_street_address"),
+      city: formData.get("checkout_city"),
+      zipcode: formData.get("checkout_zipcode"),
+      phone: formData.get("checkout_phone"),
+      email: formData.get("checkout_email"),
+      orderNotes: formData.get("order_notes"),
+    };
 
-  // Handle country selection
-  const handleSelect = (country) => {
-    setSelectedCountry(country);
-    setSearchTerm(""); // Clear search
-    setIsOpen(false); // Close dropdown
+    // Get the selected payment method label and extract only the title
+    const paymentLabel = document.querySelector(
+      'input[name="checkout_payment_method"]:checked'
+    )?.nextElementSibling;
+    const paymentMethod = paymentLabel
+      ? paymentLabel.childNodes[0].textContent.trim()
+      : "N/A";
+
+    const orderData = {
+      orderNumber: generateOrderNumber(),
+      billingDetails,
+      cart: cart.map((item) => ({
+        name: item.name,
+        price: parseFloat(item.price.toString().replace("₦", "").trim()) || 0,
+        quantity: Number(item.quantity) || 1,
+        size: item.size,
+        image: item.image,
+      })),
+      subtotal,
+      vat,
+      total,
+      date: new Date().toISOString(),
+      paymentMethod, // Use the cleaned-up payment method
+    };
+
+    try {
+      const token = localStorage.getItem("token"); // Get JWT token from localStorage
+      const response = await fetch(`${API_URL}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include JWT token
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to place order: ${response.status} - ${errorText}`
+        );
+      }
+
+      const result = await response.json();
+      console.log("Order placed successfully:", result);
+
+      clearCart();
+      navigate("/CartComplete", {
+        state: { order: result.order || orderData },
+      });
+    } catch (error) {
+      console.error("Error placing order:", error.message);
+      alert(
+        `Failed to place order: ${error.message}. Please check the console for details.`
+      );
+    }
   };
 
   return (
@@ -74,7 +127,6 @@ function CartCheckout() {
               <em>Checkout Your Items List</em>
             </span>
           </Link>
-
           <Link
             to="/CartComplete"
             className={`checkout-steps__item ${location.pathname === "/CartComplete" ? "active" : ""}`}
@@ -87,10 +139,7 @@ function CartCheckout() {
           </Link>
         </div>
 
-        <form
-          name="checkout-form"
-          action="https://uomo-html.flexkitux.com/Demo2/shop_order_complete.html"
-        >
+        <form name="checkout-form" onSubmit={handlePlaceOrder}>
           <div className="checkout-form">
             <div className="billing-info__wrapper">
               <h4>BILLING DETAILS</h4>
@@ -101,7 +150,9 @@ function CartCheckout() {
                       type="text"
                       className="form-control"
                       id="checkout_first_name"
+                      name="checkout_first_name"
                       placeholder="First Name"
+                      required
                     />
                     <label htmlFor="checkout_first_name">First Name</label>
                   </div>
@@ -112,18 +163,20 @@ function CartCheckout() {
                       type="text"
                       className="form-control"
                       id="checkout_last_name"
+                      name="checkout_last_name"
                       placeholder="Last Name"
+                      required
                     />
                     <label htmlFor="checkout_last_name">Last Name</label>
                   </div>
                 </div>
-
                 <div className="col-md-12">
                   <div className="form-floating my-3">
                     <input
                       type="text"
                       className="form-control"
                       id="checkout_company_name"
+                      name="checkout_company_name"
                       placeholder="Company Name (optional)"
                     />
                     <label htmlFor="checkout_company_name">
@@ -132,56 +185,16 @@ function CartCheckout() {
                   </div>
                 </div>
                 <div className="col-md-12">
-                  <div className="search-field my-3">
-                    <div className="form-label-fixed hover-container">
-                      <label htmlFor="search-dropdown" className="form-label">
-                        Country / Region*
-                      </label>
-                      <div className="js-hover__open">
-                        <input
-                          type="text"
-                          className="form-control form-control-lg search-field__actor search-field__arrow-down"
-                          id="search-dropdown"
-                          value={selectedCountry}
-                          onFocus={() => setIsOpen(true)}
-                          onChange={(e) => {
-                            setSelectedCountry(e.target.value);
-                            setSearchTerm(e.target.value);
-                            setIsOpen(true);
-                          }}
-                          placeholder="Choose a location..."
-                        />
-                      </div>
-                      {isOpen && (
-                        <div className="filters-container js-hidden-content mt-2">
-                          <div className="search-field__input-wrapper">
-                            <input
-                              type="text"
-                              className="search-field__input form-control form-control-sm bg-lighter border-lighter"
-                              placeholder="Search"
-                              value={searchTerm}
-                              onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                          </div>
-                          <ul className="search-suggestion list-unstyled">
-                            {filteredCountries.length > 0 ? (
-                              filteredCountries.map((country, index) => (
-                                <li
-                                  key={index}
-                                  className="search-suggestion__item js-search-select"
-                                  onClick={() => handleSelect(country)}
-                                  style={{ cursor: "pointer" }}
-                                >
-                                  {country}
-                                </li>
-                              ))
-                            ) : (
-                              <li>No matches found</li>
-                            )}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
+                  <div className="form-floating my-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="checkout_country"
+                      name="checkout_country"
+                      placeholder="Country / Region *"
+                      required
+                    />
+                    <label htmlFor="checkout_country">Country / Region *</label>
                   </div>
                 </div>
                 <div className="col-md-12">
@@ -190,21 +203,24 @@ function CartCheckout() {
                       type="text"
                       className="form-control"
                       id="checkout_street_address"
+                      name="checkout_street_address"
                       placeholder="Street Address *"
+                      required
                     />
                     <label htmlFor="checkout_street_address">
                       Street Address *
                     </label>
                   </div>
                 </div>
-
                 <div className="col-md-12">
                   <div className="form-floating my-3">
                     <input
                       type="text"
                       className="form-control"
                       id="checkout_city"
+                      name="checkout_city"
                       placeholder="Town / City *"
+                      required
                     />
                     <label htmlFor="checkout_city">Town / City *</label>
                   </div>
@@ -215,19 +231,22 @@ function CartCheckout() {
                       type="text"
                       className="form-control"
                       id="checkout_zipcode"
+                      name="checkout_zipcode"
                       placeholder="Postcode / ZIP *"
+                      required
                     />
                     <label htmlFor="checkout_zipcode">Postcode / ZIP *</label>
                   </div>
                 </div>
-
                 <div className="col-md-12">
                   <div className="form-floating my-3">
                     <input
                       type="text"
                       className="form-control"
                       id="checkout_phone"
+                      name="checkout_phone"
                       placeholder="Phone *"
+                      required
                     />
                     <label htmlFor="checkout_phone">Phone *</label>
                   </div>
@@ -238,7 +257,9 @@ function CartCheckout() {
                       type="email"
                       className="form-control"
                       id="checkout_email"
+                      name="checkout_email"
                       placeholder="Your Mail *"
+                      required
                     />
                     <label htmlFor="checkout_email">Your Mail *</label>
                   </div>
@@ -276,6 +297,7 @@ function CartCheckout() {
                 <div className="mt-3">
                   <textarea
                     className="form-control form-control_gray"
+                    name="order_notes"
                     placeholder="Order Notes (optional)"
                     cols={30}
                     rows={8}
@@ -321,7 +343,6 @@ function CartCheckout() {
                       )}
                     </tbody>
                   </table>
-
                   <table className="checkout-totals">
                     <tbody>
                       <tr>
@@ -356,10 +377,10 @@ function CartCheckout() {
                       className="form-check-label"
                       htmlFor="checkout_payment_method_1"
                     >
-                      Direct bank transfer
+                      <h4>Direct bank transfer </h4>
                       <span className="option-detail d-block">
                         Make your payment directly into our bank account. Please
-                        use your Order ID as the payment reference.Your order
+                        use your Order ID as the payment reference. Your order
                         will not be shipped until the funds have cleared in our
                         account.
                       </span>
@@ -379,9 +400,7 @@ function CartCheckout() {
                       Check payments
                       <span className="option-detail d-block">
                         Phasellus sed volutpat orci. Fusce eget lore mauris
-                        vehicula elementum gravida nec dui. Aenean aliquam
-                        varius ipsum, non ultricies tellus sodales eu. Donec
-                        dignissim viverra nunc, ut aliquet magna posuere eget.
+                        vehicula elementum gravida nec dui.
                       </span>
                     </label>
                   </div>
@@ -399,9 +418,7 @@ function CartCheckout() {
                       Cash on delivery
                       <span className="option-detail d-block">
                         Phasellus sed volutpat orci. Fusce eget lore mauris
-                        vehicula elementum gravida nec dui. Aenean aliquam
-                        varius ipsum, non ultricies tellus sodales eu. Donec
-                        dignissim viverra nunc, ut aliquet magna posuere eget.
+                        vehicula elementum gravida nec dui.
                       </span>
                     </label>
                   </div>
@@ -419,9 +436,7 @@ function CartCheckout() {
                       Paypal
                       <span className="option-detail d-block">
                         Phasellus sed volutpat orci. Fusce eget lore mauris
-                        vehicula elementum gravida nec dui. Aenean aliquam
-                        varius ipsum, non ultricies tellus sodales eu. Donec
-                        dignissim viverra nunc, ut aliquet magna posuere eget.
+                        vehicula elementum gravida nec dui.
                       </span>
                     </label>
                   </div>
@@ -435,7 +450,7 @@ function CartCheckout() {
                     .
                   </div>
                 </div>
-                <button className="btn btn-primary btn-checkout">
+                <button type="submit" className="btn btn-primary btn-checkout">
                   PLACE ORDER
                 </button>
               </div>
@@ -448,4 +463,4 @@ function CartCheckout() {
   );
 }
 
-export default CartCheckout; // Export the component
+export default CartCheckout;

@@ -1,50 +1,10 @@
+/* Base Styles */
 .navbar {
   background: grey;
   color: black;
   padding: 1rem 2rem;
   display: flex;
   align-items: center;
-}
-
-.profil-icon {
-  background: none; /* Removes default background */
-  border: none; /* Removes default border */
-
-  padding: 0; /* Removes extra spacing */
-  cursor: pointer; /* Ensures it's clickable */
-  outline: none; /* Removes focus outline */
-  color: white;
-}
-
-.profil-icon:focus {
-  outline: none; /* Prevents border when clicked */
-  box-shadow: none; /* Removes any shadow */
-}
-
-.shows {
-  border: none;
-  background: grey;
-  color: #ccc;
-}
-.profil-container {
-  position: relative;
-}
-
-.profil-dropdown {
-  position: absolute;
-  flex-direction: column;
-  top: 40px;
-  right: 0;
-  border-radius: 6px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
-
-.profil-dropdown .shows {
-  display: block;
-  width: 100%;
-  text-align: center;
-  padding: 7px 0;
 }
 
 .navbar-container {
@@ -57,7 +17,7 @@
 }
 
 .logo-container {
-  flex-grow: 1; /* Allows it to take space */
+  flex-grow: 1;
   display: flex;
   justify-content: center;
   max-width: 150px;
@@ -66,17 +26,19 @@
 .logo {
   font-size: 1rem;
   color: black;
+  position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  position: absolute;
-  width: 150px; /* Adjust logo width */
+  width: 150px;
   height: auto;
 }
 
 .nav-links {
   display: flex;
-  flex: 2; /* Takes equal space */
+  flex: 2;
   gap: 20px;
+  justify-content: flex-start; /* Align to the left */
+  align-items: center;
 }
 
 .nav-link {
@@ -85,20 +47,114 @@
   font-size: 1.2rem;
   padding: 0.5rem 1rem;
   border-radius: 5px;
-  transition: background-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s;
 }
 
 .nav-link:hover {
   background-color: #555;
 }
 
+/* Shop Dropdown Styles */
+.shop-dropdown {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.shop-dropdown span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dropdown-icon {
+  transition: transform 0.3s ease;
+}
+
+.dropdown-icon.rotate {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  min-width: 150px;
+  z-index: 1000;
+}
+
+.shop-dropdown:hover .dropdown-menu {
+  display: block; /* For desktop hover */
+}
+
+.dropdown-item {
+  display: block;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+  color: #007bff;
+}
+
+/* Profile Dropdown Styles */
+.profil-container {
+  position: relative;
+}
+
+.profil-icon {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  color: white;
+  width: 30px;
+}
+
+.profil-icon:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.profil-dropdown {
+  position: absolute;
+  flex-direction: column;
+  top: 40px;
+  right: 0;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: white;
+  z-index: 10;
+}
+
+.profil-dropdown .shows {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 7px 0;
+  border: none;
+  background: grey;
+  color: #ccc;
+}
+
+/* Cart Styles */
 .cart-container {
   position: relative;
   flex: 1;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  top: 20px;
+  top: 0;
 }
 
 .cart-icon {
@@ -141,31 +197,21 @@
   padding: 0;
 }
 
-.menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  position: relative;
-  z-index: 1002; /* Ensure it's on top of everything */
-}
-
-.menu-toggle.menu-open {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  color: white;
-  z-index: 1002;
-}
-
 .cart-dropdown li {
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
-  border-bottom: 2px solid #333; /* Added bottom border */
+  border-bottom: 2px solid #333;
   margin: 8px;
   padding: 7px;
+}
+
+.cart-item-content span {
+  margin-right: 20px;
+}
+
+.cart-item-content img {
+  margin-right: 10px;
 }
 
 .view-cart-btn {
@@ -184,12 +230,30 @@
   background-color: #555;
 }
 
-.cart-item-content span {
-  margin-right: 20px; /* Adds space between the spans */
+.remove-btn {
+  color: red;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 5px;
 }
 
-.cart-item-content img {
-  margin-right: 10px; /* Adds space between the image and the item name */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  position: relative;
+  z-index: 1002;
+}
+
+.menu-toggle.menu-open {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  color: white;
+  z-index: 1002;
 }
 
 .close-menu {
@@ -204,17 +268,22 @@
   z-index: 1000;
 }
 
-.remove-btn {
-  color: red;
-  border: none;
-  cursor: pointer;
-  font-size: 12px;
-  border-radius: 5px;
+/* Desktop Styles (min-width: 1024px) */
+@media (min-width: 1024px) {
+  .nav-links {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .menu-toggle {
+    display: none;
+  }
 }
 
-@media (max-width: 1024px) {
+/* Mobile Styles (max-width: 767px) */
+@media (max-width: 1023px) {
   .navbar {
-    padding: 1rem;
+    padding: 0.5rem;
     position: relative;
   }
 
@@ -228,54 +297,38 @@
   }
 
   .logo-container {
-    left: 50px;
-    margin-bottom: 40px;
+    margin-bottom: 0;
+    max-width: 100px;
+  }
+
+  .logo {
+    width: 100px;
   }
 
   .menu-toggle {
     display: block;
-    font-size: 24px;
-    background: none;
-    border: none;
-    cursor: pointer;
+    font-size: 20px;
     position: absolute;
-    top: 5px;
-    z-index: 1002;
+    top: 10px;
+    left: 10px;
   }
 
-  .cart-container {
-    position: absolute;
-    right: 3px;
-  }
-
-  .cart-item-content {
-    font-size: 15px;
-  }
-
-  .cart-icon {
-    bottom: 20px; /* From remote */
-  }
-
-  .profil-icon {
-    margin-bottom: 35px;
-    width: 20px;
-  }
-
-  /* Hide nav links by default */
   .nav-links {
     display: none;
     flex-direction: column;
-    position: absolute;
-    top: 60px;
+    position: fixed;
+    top: 0;
     left: 0;
     width: 100%;
+    height: 100vh;
     background: grey;
     text-align: center;
     z-index: 1001;
-    padding: 10px 0;
+    padding: 60px 0 20px 0;
+    justify-content: flex-start;
+    align-items: flex-start;
   }
 
-  /* Show nav links when menu is open */
   .nav-links.open {
     display: flex;
   }
@@ -283,33 +336,73 @@
   .nav-link {
     padding: 10px;
     width: 100%;
-    color: white;
-    text-decoration: none;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin: 10px;
   }
 
   .nav-link:hover {
-    background-color: #555;
-  }
-  .profil-dropdown {
-    position: absolute;
-    right: 0;
-    border-radius: 6px;
-    box-shadow: 1 6px 6px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    background: white; /* optional: ensure visibility */
-    margin-bottom: 50px;
+    background-color: grey;
   }
 
-  .profil-dropdown .shows {
-    display: block;
+  .shop-dropdown {
     width: 100%;
-    text-align: center;
-    padding: 7px 0;
+    justify-content: flex-start;
+    margin: 10px;
+    padding: 10px;
+  }
+  .dropdown-menu {
+    position: static;
+    box-shadow: none;
+    background-color: transparent;
+    margin-right: 50px;
+    padding: 10px;
   }
 
-  .profil-container {
-    position: relative;
-    display: inline-block;
+  .dropdown-item {
+    padding: 10px 30px;
+    color: white;
+    font-size: 1rem;
+    width: 100%;
+    background: grey;
+    text-align: center;
+  }
+
+  .dropdown-item:hover {
+    background-color: #555;
+    color: white;
+  }
+
+  .cart-container {
+    position: absolute;
+    right: 10px;
+    top: 0;
+  }
+
+  .cart-icon {
+    font-size: 24px;
+  }
+
+  .cart-dropdown {
+    width: 90vw;
+    max-width: 300px;
+    top: 30px;
+  }
+
+  .cart-item-content {
+    font-size: 14px;
+  }
+
+  .profil-icon {
+    width: 20px;
+    margin-bottom: 0;
+  }
+
+  .profil-dropdown {
+    top: 30px;
+    right: 0;
+    width: 150px;
   }
 }

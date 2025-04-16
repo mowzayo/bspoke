@@ -14,6 +14,10 @@ import ShopPage from "./pages/ShopPage";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import { CartProvider } from "./CartContext";
+import AdminOrders from "./pages/AdminOrders";
+import ShopMen from "./pages/ShopMen"; // Import the new page
+import ShopShirt from "./pages/ShopShirt"; // Import new page
+import ShopPants from "./pages/ShopPants"; // Import new page
 import "./App.css"; // Add global styles
 
 function App() {
@@ -25,6 +29,9 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<ShopPage />} />
+            <Route path="/ShopMen" element={<ShopMen />} />
+            <Route path="/ShopShirt" element={<ShopShirt />} />
+            <Route path="/ShopPants" element={<ShopPants />} />
             <Route path="/CartCheckout" element={<CartCheckout />} />
             <Route path="/CartComplete" element={<CartComplete />} />
             <Route path="/cart" element={<Cart />} />
@@ -34,6 +41,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/adminorders" element={<AdminOrders />} />
           </Routes>
           <Footer />
         </Router>

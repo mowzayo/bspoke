@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../CartContext";
 import "./Profile.css";
 
@@ -8,12 +8,14 @@ function Profile() {
   const navigate = useNavigate();
 
   const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const token = localStorage.getItem("token"); // Add this
 
   const [orders, setOrders] = useState([]);
   const [address, setAddress] = useState({ street: "", city: "", zip: "" });
   const [card, setCard] = useState({ number: "", expiry: "", cvv: "" });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -27,7 +29,10 @@ function Profile() {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
-        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Use JWT
+        },
       });
       if (!response.ok) throw new Error("Failed to fetch profile data");
       const data = await response.json();
@@ -46,8 +51,10 @@ function Profile() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/profile/address`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Use JWT
+        },
         body: JSON.stringify(address),
       });
       if (!response.ok) throw new Error("Failed to save address");
@@ -62,8 +69,10 @@ function Profile() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/profile/card`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Use JWT
+        },
         body: JSON.stringify(card),
       });
       if (!response.ok) throw new Error("Failed to save card");
@@ -80,6 +89,12 @@ function Profile() {
   return (
     <div className="profilee-container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Profile</h1>
+      <button className="bu">
+        <Link to="/AdminOrders" onClick={() => setMenuOpen(false)}>
+          AdminOrders
+        </Link>
+      </button>
+
       <p>Email: {user.email}</p>
       {error && <p className="text-red-500">{error}</p>}
 

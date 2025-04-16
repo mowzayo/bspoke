@@ -10,47 +10,40 @@ function Dashboard() {
     image: "",
     description: "",
     sizes: "",
+    category: "",
+    outOfStock: false,
   });
   const [images, setImages] = useState([]);
   const [editId, setEditId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 12;
   const navigate = useNavigate();
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000"; // Use env variable
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-  // Check JWT token and load products
   useEffect(() => {
     const checkSession = async () => {
       const token = localStorage.getItem("token");
-      console.log("Dashboard - Token from localStorage:", token); // Debug token presence
       if (!token) {
-        console.log("No token found, redirecting to login");
         navigate("/login");
         return;
       }
 
       try {
-        console.log("Verifying token with /api/auth/verify..."); // Debug fetch start
         const response = await fetch(`${API_URL}/api/auth/verify`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("Verify response status:", response.status); // Debug response status
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(
-            `Verification failed: ${response.status} - ${errorText}`
-          );
+          throw new Error("Verification failed");
         }
         const { user } = await response.json();
-        console.log("Verified user:", user); // Debug user data
         if (!user.isAdmin) {
-          console.log("User is not an admin, redirecting to home");
           navigate("/");
           return;
         }
 
-        // Fetch products
         const productResponse = await fetch(`${API_URL}/api/products`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -58,15 +51,21 @@ function Dashboard() {
         });
         if (!productResponse.ok) throw new Error("Unauthorized");
         const data = await productResponse.json();
-        console.log("Initial products fetched:", data);
         setProducts(data);
       } catch (err) {
-        console.error("Session check error:", err.message); // Debug error details
         navigate("/login");
       }
     };
     checkSession();
-  }, [navigate, API_URL]); // Add API_URL to dependencies
+  }, [navigate, API_URL]);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
 
   const fetchProducts = async () => {
     const token = localStorage.getItem("token");
@@ -78,15 +77,11 @@ function Dashboard() {
       });
       if (!response.ok) throw new Error("Failed to fetch products");
       const data = await response.json();
-      console.log("Fetched products:", data);
       setProducts(data);
+      setCurrentPage(1);
     } catch (err) {
       console.error("Fetch error:", err);
     }
-  };
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleImageChange = (e) => {
@@ -95,16 +90,16 @@ function Dashboard() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Add Product button clicked");
     const token = localStorage.getItem("token");
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
     formDataToSend.append("price", Number(formData.price));
     formDataToSend.append("description", formData.description);
     formDataToSend.append("sizes", formData.sizes);
+    formDataToSend.append("category", formData.category);
+    formDataToSend.append("outOfStock", formData.outOfStock);
     images.forEach((image, idx) => {
       formDataToSend.append("images", image);
-      console.log(`Appending image ${idx}:`, image.name);
     });
 
     const method = editId ? "PUT" : "POST";
@@ -120,12 +115,16 @@ function Dashboard() {
         },
         body: formDataToSend,
       });
-      console.log("Response status:", response.status);
-      const responseText = await response.text();
-      console.log("Response text:", responseText);
       if (!response.ok) throw new Error("Failed to save product");
       await fetchProducts();
-      setFormData({ name: "", price: "", description: "", sizes: "" });
+      setFormData({
+        name: "",
+        price: "",
+        description: "",
+        sizes: "",
+        category: "",
+        outOfStock: false,
+      });
       setImages([]);
       setEditId(null);
     } catch (error) {
@@ -137,15 +136,16 @@ function Dashboard() {
     setFormData({
       name: product.name,
       price: product.price,
-      image: product.image,
+      image: product.images ? product.images[0] : "",
       description: product.description,
-      sizes: product.sizes.join(", "),
+      sizes: product.sizes ? product.sizes.join(", ") : "",
+      category: product.category || "",
+      outOfStock: product.outOfStock || false,
     });
     setEditId(product._id);
   };
 
   const handleDelete = async (id) => {
-    console.log("Delete button clicked for ID:", id);
     const token = localStorage.getItem("token");
     try {
       const response = await fetch(`${API_URL}/api/products/${id}`, {
@@ -154,11 +154,7 @@ function Dashboard() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Delete response status:", response.status);
-      const responseText = await response.text();
-      console.log("Delete response text:", responseText);
-      if (!response.ok)
-        throw new Error(`Failed to delete product: ${response.status}`);
+      if (!response.ok) throw new Error("Failed to delete product");
       await fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -170,10 +166,28 @@ function Dashboard() {
     navigate("/login");
   };
 
+  // Pagination Logic
+  const totalProducts = products.length;
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  const startIndex = (currentPage - 1) * productsPerPage;
+  const endIndex = startIndex + productsPerPage;
+  const currentProducts = products.slice(startIndex, endIndex);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <div className="dashboard">
       <h1>Admin Dashboard</h1>
-      {/* Added to use handleLogout */}
       <form
         onSubmit={handleSubmit}
         className="product-form"
@@ -215,6 +229,27 @@ function Dashboard() {
           onChange={handleChange}
           placeholder="Sizes (e.g., S, M, L)"
         />
+        <select
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select Category</option>
+          <option value="shirt">Shirt</option>
+          <option value="men">Men</option>
+          <option value="pants">Pants</option>
+          <option value="gift">Gift</option>
+        </select>
+        <label>
+          <input
+            type="checkbox"
+            name="outOfStock"
+            checked={formData.outOfStock}
+            onChange={handleChange}
+          />
+          Out of Stock
+        </label>
         <button className="submit" type="submit">
           {editId ? "Update Product" : "Add Product"}
         </button>
@@ -226,11 +261,13 @@ function Dashboard() {
             <th>Name</th>
             <th>Price</th>
             <th>Image</th>
+            <th>Category</th>
+            <th>Stock Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          {currentProducts.map((product) => (
             <tr key={product._id}>
               <td>{product.name}</td>
               <td>₦{product.price}</td>
@@ -248,6 +285,8 @@ function Dashboard() {
                   <span>No images</span>
                 )}
               </td>
+              <td>{product.category || "N/A"}</td>
+              <td>{product.outOfStock ? "Out of Stock" : "In Stock"}</td>
               <td>
                 <button className="submi" onClick={() => handleEdit(product)}>
                   Edit
@@ -263,9 +302,50 @@ function Dashboard() {
           ))}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <div
+        className="pagination"
+        style={{ marginTop: "20px", textAlign: "center" }}
+      >
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          style={{
+            marginRight: "10px",
+            padding: "5px 10px",
+            cursor: currentPage === 1 ? "not-allowed" : "pointer",
+            backgroundColor: currentPage === 1 ? "#ccc" : "#007bff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+          }}
+        >
+          Prev
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          style={{
+            marginLeft: "10px",
+            padding: "5px 10px",
+            cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+            backgroundColor: currentPage === totalPages ? "#ccc" : "#007bff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+          }}
+        >
+          Next
+        </button>
+      </div>
+
       <button className="logout" onClick={handleLogout}>
         Logout
-      </button>{" "}
+      </button>
     </div>
   );
 }

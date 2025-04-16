@@ -6,7 +6,7 @@ import "./ShopPage.css";
 import bvideo from "../assets/bvideo.mp4";
 import WishlistButton from "./WishlistButton";
 
-function ShopPage() {
+function ShopPants() {
   const [products, setProducts] = useState([]);
   const { addToWishlist } = useCart();
 
@@ -18,11 +18,15 @@ function ShopPage() {
     try {
       const API_BASE_URL =
         process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const response = await fetch(`${API_BASE_URL}/api/products`);
+      const response = await fetch(`${API_BASE_URL}/api/products`); // Public endpoint
       if (!response.ok) throw new Error("Failed to fetch products");
       const data = await response.json();
-      console.log("Fetched products:", data);
-      setProducts(data);
+      console.log("Fetched products for ShopPants:", data);
+      // Filter products to show only those with category "pants"
+      const pantsProducts = Array.isArray(data)
+        ? data.filter((product) => product?.category?.toLowerCase() === "pants")
+        : [];
+      setProducts(pantsProducts);
     } catch (err) {
       console.error("Fetch error:", err);
     }
@@ -238,12 +242,12 @@ function ShopPage() {
                       src="https://uomo-html.flexkitux.com/images/slideshow-character1.png"
                       width={246}
                       height={450}
-                      alt="Woman Fashion 1"
+                      alt="Pants Fashion 1"
                       className="slideshow-character__img animate animate_fade animate_btt animate_delay-9 w-auto h-auto"
                     />
                     <div className="character_markup">
                       <p className="font-special text-uppercase animate animate_fade animate_rtl animate_delay-10">
-                        Summer
+                        Pants
                       </p>
                     </div>
                   </div>
@@ -260,22 +264,22 @@ function ShopPage() {
                       src="https://uomo-html.flexkitux.com/images/slideshow-character2.png"
                       width={261}
                       height={450}
-                      alt="Woman Fashion 2"
+                      alt="Pants Fashion 2"
                       className="slideshow-character__img animate animate_fade animate_btt animate_delay-9 w-auto h-auto"
                     />
                   </div>
                   <div className="slideshow-text container position-absolute start-50 top-50 translate-middle p-3 p-xl-5">
                     <h6 className="text_dash text-uppercase text-red fs-base fw-medium animate animate_fade animate_btt animate_delay-3">
-                      Summer 2024
+                      Pants 2024
                     </h6>
                     <h2 className="text-uppercase page-title fw-bold animate animate_fade animate_btt animate_delay-3">
-                      Hello New Season
+                      Pants Collection
                     </h2>
                     <h6 className="text-uppercase mb-3 animate animate_fade animate_btt animate_delay-3">
                       Limited Time Offer - Up to 60% off & Free Shipping
                     </h6>
                     <Link
-                      to="/"
+                      to="/pants"
                       className="btn-link btn-link_lg text-uppercase fw-medium animate animate_fade animate_btt animate_delay-3"
                     >
                       Discover More
@@ -302,10 +306,10 @@ function ShopPage() {
                 /
               </span>
               <Link
-                to="/"
+                to="/pants"
                 className="menu-link menu-link_us-s text-uppercase fw-medium"
               >
-                The Shop
+                Pants Collection
               </Link>
             </div>
           </div>
@@ -322,77 +326,55 @@ function ShopPage() {
                       <div className="swiper-container background-img js-swiper-slider">
                         <div className="swiper-wrapper">
                           <div className="swiper-slide">
-                            {product.outOfStock ? (
-                              <div className="out-of-stock-overlay absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-medium">
-                                Out of Stock
-                              </div>
-                            ) : (
-                              <Link to={`/item/${product._id}`}>
-                                <img
-                                  loading="lazy"
-                                  src={
-                                    Array.isArray(product.images) &&
-                                    product.images.length > 0
-                                      ? product.images[0]
-                                      : ""
-                                  }
-                                  alt={product.name}
-                                  className="pc__img w-full h-64 object-cover"
-                                />
-                              </Link>
-                            )}
+                            <Link to={`/item/${product._id}`}>
+                              <img
+                                loading="lazy"
+                                src={
+                                  Array.isArray(product.images) &&
+                                  product.images.length > 0
+                                    ? product.images[0]
+                                    : ""
+                                }
+                                alt={product.name}
+                                className="pc__img w-full h-64 object-cover"
+                              />
+                            </Link>
                           </div>
                           {product.images && product.images[1] && (
                             <div className="swiper-slide">
-                              {product.outOfStock ? (
-                                <div className="out-of-stock-overlay absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-medium">
-                                  Out of Stock
-                                </div>
-                              ) : (
-                                <Link to={`/item/${product._id}`}>
-                                  <img
-                                    loading="lazy"
-                                    src={product.images[1]}
-                                    alt={`${product.name} alt`}
-                                    className="pc__img w-full h-64 object-cover"
-                                  />
-                                </Link>
-                              )}
+                              <Link to={`/item/${product._id}`}>
+                                <img
+                                  loading="lazy"
+                                  src={product.images[1]}
+                                  alt={`${product.name} alt`}
+                                  className="pc__img w-full h-64 object-cover"
+                                />
+                              </Link>
                             </div>
                           )}
                         </div>
-                        {!product.outOfStock && (
-                          <>
-                            <span className="pc__img-prev">
-                              <svg width={7} height={11} viewBox="0 0 7 11">
-                                <use href="#icon_prev_sm" />
-                              </svg>
-                            </span>
-                            <span className="pc__img-next">
-                              <svg width={7} height={11} viewBox="0 0 7 11">
-                                <use href="#icon_next_sm" />
-                              </svg>
-                            </span>
-                          </>
-                        )}
+                        <span className="pc__img-prev">
+                          <svg width={7} height={11} viewBox="0 0 7 11">
+                            <use href="#icon_prev_sm" />
+                          </svg>
+                        </span>
+                        <span className="pc__img-next">
+                          <svg width={7} height={11} viewBox="0 0 7 11">
+                            <use href="#icon_next_sm" />
+                          </svg>
+                        </span>
                       </div>
-                      {!product.outOfStock && (
-                        <Link
-                          to={`/item/${product._id}`}
-                          className="view-page absolute inset-0 flex items-center justify-center text-white bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-200 text-sm font-medium"
-                        >
-                          View Page
-                        </Link>
-                      )}
+                      <Link
+                        to={`/item/${product._id}`}
+                        className="view-page absolute inset-0 flex items-center justify-center text-white bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-200 text-sm font-medium"
+                      >
+                        View Page
+                      </Link>
                     </div>
 
                     <div className="pc__info">
                       <div className="pc__header flex justify-between items-center">
-                        <WishlistButton
-                          product={product}
-                          iconOnly
-                          disabled={product.outOfStock}
-                        />
+                        <WishlistButton product={product} iconOnly />
                         <div className="product-card__price d-flex">
                           {product.oldPrice && (
                             <span className="money price price-old">
@@ -405,25 +387,14 @@ function ShopPage() {
                         </div>
                       </div>
                       <h6 className="pc__title">
-                        {product.outOfStock ? (
-                          <span>{product.name}</span>
-                        ) : (
-                          <Link to={`/item/${product._id}`}>
-                            {product.name}
-                          </Link>
-                        )}
+                        <Link to={`/item/${product._id}`}>{product.name}</Link>
                       </h6>
-                      {product.outOfStock && (
-                        <p className="out-of-stock-text text-red-500 text-sm mt-2">
-                          Out of Stock
-                        </p>
-                      )}
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <p>No products available.</p>
+              <p>No pants available.</p>
             )}
           </div>
         </div>
@@ -432,4 +403,4 @@ function ShopPage() {
   );
 }
 
-export default ShopPage;
+export default ShopPants;

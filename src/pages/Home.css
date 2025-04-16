@@ -155,11 +155,12 @@
 .product-grid {
   display: grid;
   grid-template-columns: repeat(
-    auto-fit,
-    minmax(250px, 1fr)
-  ); /* Responsive grid layout */
+    3,
+    1fr
+  ); /* Exactly 3 columns, each taking equal space */
   gap: 20px; /* Space between items */
   padding: 20px;
+  margin: 10px;
 }
 
 /* Product item */
@@ -181,6 +182,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
   height: 150px;
+  margin: 20px;
 }
 
 .product-image img {
@@ -229,6 +231,7 @@
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  height: 30px;
 }
 
 .overlay button:hover {

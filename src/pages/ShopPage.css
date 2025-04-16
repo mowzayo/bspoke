@@ -61,6 +61,24 @@
   color: inherit;
 }
 
+/* Existing styles ... */
+
+.out-of-stock-overlay {
+  z-index: 10;
+}
+
+.out-of-stock-text {
+  color: #dc3545; /* Red color */
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+/* Ensure disabled wishlist button is styled */
+.wishlist-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
   .product-grid {

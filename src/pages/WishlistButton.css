@@ -13,7 +13,6 @@
 .wishlist-icon {
   display: inline-block;
   cursor: pointer;
-
 }
 
 /* Ensure text and icon styles are clean */
@@ -36,4 +35,21 @@
 
 .text-red-500 {
   color: #ef4444;
+}
+
+/* Reduce button size on smaller screens */
+@media (max-width: 767px) {
+  .wishlist-button {
+    gap: 0.3rem; /* Reduce gap to 8px */
+    padding: 0.0025rem 0.355rem; /* Reduce padding to 2px 4px */
+    border-radius: 3px; /* Slightly smaller border radius */
+  }
+
+  .text-sm {
+    font-size: 0.7rem; /* Reduce font size to 11.2px */
+  }
+
+  .wishlist-icon {
+    transform: scale(0.3); /* Scale down the icon slightly */
+  }
 }

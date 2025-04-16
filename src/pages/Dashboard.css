@@ -146,6 +146,42 @@ td .submi:last-child:hover {
   background: #c82333; /* Darker red */
 }
 
+/* Add to Dashboard.css */
+.out-of-stock-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.out-of-stock-label input {
+  width: 16px;
+  height: 16px;
+}
+
+.product-card {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.product-card p {
+  margin: 5px 0;
+}
+
+.product-card button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.product-card p.out-of-stock {
+  color: red;
+  font-weight: bold;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .dashboard {
