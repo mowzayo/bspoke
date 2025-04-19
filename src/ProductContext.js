@@ -1,4 +1,3 @@
-// src/ProductContext.js
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
@@ -22,10 +21,15 @@ export const ProductProvider = ({ children }) => {
           ...product,
           category: product.category || "uncategorized",
         }));
-        console.log("Fetched products:", productsWithDefaultCategory); // Add this
+        console.log("Fetched products:", productsWithDefaultCategory);
         setProducts(productsWithDefaultCategory);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching products:", {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+          url: `${API_URL}/api/products`,
+        });
       }
     };
     fetchProducts();
@@ -37,3 +41,5 @@ export const ProductProvider = ({ children }) => {
     </ProductContext.Provider>
   );
 };
+
+export default ProductProvider;
