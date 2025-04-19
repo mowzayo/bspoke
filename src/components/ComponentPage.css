@@ -1,0 +1,12 @@
+.out-of-stock-overlay {
+  z-index: 10;
+  background-color: greenyellow;
+}
+
+.out-of-stock-text {
+  color: #dc3545; /* Red color */
+  font-weight: 500;
+  background-color: #007bff;
+  height: 30px;
+  padding: 15px;
+}

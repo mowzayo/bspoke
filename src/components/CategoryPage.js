@@ -4,6 +4,7 @@ import "swiper/swiper-bundle.css";
 import { ProductContext } from "../ProductContext";
 import WishlistButton from "../pages/WishlistButton";
 import "../pages/ShopPage.css";
+import "./ComponentPage.css";
 
 function CategoryPage() {
   const { products } = useContext(ProductContext);
