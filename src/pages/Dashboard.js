@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./Dashboard.css";
 
 function Dashboard() {
@@ -15,6 +15,7 @@ function Dashboard() {
   });
   const [images, setImages] = useState([]);
   const [editId, setEditId] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
   const navigate = useNavigate();
@@ -188,11 +189,18 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <h1>Admin Dashboard</h1>
+
       <form
         onSubmit={handleSubmit}
         className="product-form"
         encType="multipart/form-data"
       >
+        <button className="bu">
+          <Link to="/AdminOrders" onClick={() => setMenuOpen(false)}>
+            AdminOrders
+          </Link>
+        </button>
+
         <input
           name="name"
           value={formData.name}
@@ -231,6 +239,7 @@ function Dashboard() {
         />
         <select
           name="category"
+          className="sel"
           value={formData.category}
           onChange={handleChange}
           required
@@ -241,15 +250,21 @@ function Dashboard() {
           <option value="pants">Pants</option>
           <option value="gift">Gift</option>
         </select>
-        <label>
-          <input
-            type="checkbox"
-            name="outOfStock"
-            checked={formData.outOfStock}
-            onChange={handleChange}
-          />
-          Out of Stock
-        </label>
+
+        <div className="flex items-centerr gap-2 border-black border-black p-2 rounded w-[170px] mb-3">
+          <label className="toggle-switch">
+            <input
+              type="checkbox"
+              name="outOfStock"
+              checked={formData.outOfStock}
+              onChange={handleChange}
+              className="toggle-input"
+            />
+            <span className="slider"></span>
+          </label>
+          <span>Out of Stock</span>
+        </div>
+
         <button className="submit" type="submit">
           {editId ? "Update Product" : "Add Product"}
         </button>
@@ -342,10 +357,6 @@ function Dashboard() {
           Next
         </button>
       </div>
-
-      <button className="logout" onClick={handleLogout}>
-        Logout
-      </button>
     </div>
   );
 }

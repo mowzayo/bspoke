@@ -93,6 +93,7 @@ const Navbar = () => {
                         (item.images && item.images[0]) ||
                         item.image ||
                         "/placeholder.jpg";
+
                       return (
                         <li
                           key={`${item.productId}-${item.size}`}
@@ -202,7 +203,7 @@ const Navbar = () => {
                 className="dropdown-item"
                 onClick={closeShopDropdown}
               >
-                Shop Men
+                Men
               </Link>
               <Link
                 to="/ShopShirt"

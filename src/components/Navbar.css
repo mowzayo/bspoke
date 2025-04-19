@@ -34,11 +34,11 @@
 }
 
 .nav-links {
+  gap: 5px;
   display: flex;
-  flex: 2;
-  gap: 20px;
   justify-content: flex-start; /* Align to the left */
   align-items: center;
+  bottom: 20px;
 }
 
 .nav-link {
@@ -109,6 +109,8 @@
 /* Profile Dropdown Styles */
 .profil-container {
   position: relative;
+  top: 30px;
+  right: 8px;
 }
 
 .profil-icon {
@@ -165,12 +167,12 @@
   position: relative;
   font-size: 30px;
   font-weight: bold;
+  top: 30px;
 }
 
 .cart-count {
   position: absolute;
-  top: 5px;
-  right: -10px;
+  right: 10px;
   background-color: rgb(242, 242, 245);
   color: rgb(3, 3, 3);
   border-radius: 50%;
@@ -379,6 +381,7 @@
     position: absolute;
     right: 10px;
     top: 0;
+    bottom: 40px;
   }
 
   .cart-icon {

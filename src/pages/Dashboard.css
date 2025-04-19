@@ -8,10 +8,69 @@ body {
   padding: 0;
 }
 
+.bu {
+  margin-bottom: 10px;
+}
+
 .dashboard {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+}
+/* styles.css or your CSS file */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.toggle-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.toggle-input:checked + .slider {
+  background-color: #007bff;
+}
+
+.toggle-input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.flex.items-centerr {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* 8px spacing */
+  border: 1px solid black; /* Added valid border */
+  padding: 0.5rem; /* Optional: Add padding for better spacing inside border */
+  border-radius: 4px; /* Optional: Rounded corners for a polished look */
+  width: 170px;
 }
 
 .dashboard h1 {
@@ -157,29 +216,6 @@ td .submi:last-child:hover {
 .out-of-stock-label input {
   width: 16px;
   height: 16px;
-}
-
-.product-card {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
-}
-
-.product-card p {
-  margin: 5px 0;
-}
-
-.product-card button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.product-card p.out-of-stock {
-  color: red;
-  font-weight: bold;
 }
 
 /* Responsive adjustments */

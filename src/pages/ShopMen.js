@@ -8,6 +8,8 @@ import WishlistButton from "./WishlistButton";
 
 function ShopMen() {
   const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1); // Added state for current page
+  const [productsPerPage] = useState(8); // Added state for products per page
   const { addToWishlist } = useCart();
 
   useEffect(() => {
@@ -29,6 +31,25 @@ function ShopMen() {
       setProducts(menProducts);
     } catch (err) {
       console.error("Fetch error:", err);
+    }
+  };
+  // CHANGE 3: Added pagination logic at the component level
+  const totalProducts = products.length;
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  const startIndex = (currentPage - 1) * productsPerPage;
+  const endIndex = startIndex + productsPerPage;
+  const currentProducts = products.slice(startIndex, endIndex);
+
+  // CHANGE 4: Defined pagination handlers at the component level
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
     }
   };
 
@@ -398,6 +419,47 @@ function ShopMen() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Pagination Controls */}
+      {/* CHANGE 6: Pagination controls remain but now work with defined state and handlers */}
+      <div
+        className="pagination"
+        style={{ marginTop: "20px", textAlign: "center" }}
+      >
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          style={{
+            marginRight: "10px",
+            padding: "5px 10px",
+            cursor: currentPage === 1 ? "not-allowed" : "pointer",
+            backgroundColor: currentPage === 1 ? "#ccc" : "#007bff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+          }}
+        >
+          Prev
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          style={{
+            marginLeft: "10px",
+            padding: "5px 10px",
+            cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+            backgroundColor: currentPage === totalPages ? "#ccc" : "#007bff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+          }}
+        >
+          Next
+        </button>
       </div>
     </div>
   );

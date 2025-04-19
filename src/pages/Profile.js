@@ -89,11 +89,6 @@ function Profile() {
   return (
     <div className="profilee-container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Profile</h1>
-      <button className="bu">
-        <Link to="/AdminOrders" onClick={() => setMenuOpen(false)}>
-          AdminOrders
-        </Link>
-      </button>
 
       <p>Email: {user.email}</p>
       {error && <p className="text-red-500">{error}</p>}
