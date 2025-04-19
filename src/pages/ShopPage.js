@@ -1,56 +1,52 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import "swiper/swiper-bundle.css";
 import { useCart } from "../CartContext";
+import { ProductContext } from "../ProductContext";
 import "./ShopPage.css";
 import bvideo from "../assets/bvideo.mp4";
 import WishlistButton from "./WishlistButton";
 
 function ShopPage() {
-  // CHANGE 1: Added state variables for pagination
-  const [products, setProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1); // Added state for current page
-  const [productsPerPage] = useState(8); // Added state for products per page
+  const { products } = useContext(ProductContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage, setProductsPerPage] = useState(
+    window.matchMedia("(min-width: 768px)").matches ? 9 : 8
+  );
   const { addToWishlist } = useCart();
 
+  // Responsive products per page
   useEffect(() => {
-    fetchProducts();
+    const handleResize = () => {
+      setProductsPerPage(
+        window.matchMedia("(min-width: 768px)").matches ? 9 : 8
+      );
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const fetchProducts = async () => {
-    try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const response = await fetch(`${API_BASE_URL}/api/products`);
-      if (!response.ok) throw new Error("Failed to fetch products");
-      const data = await response.json();
-      console.log("Fetched products:", data);
-      setProducts(data);
-    } catch (err) {
-      console.error("Fetch error:", err);
-    }
-    // CHANGE 2: Removed pagination logic from fetchProducts
-    // The pagination logic was incorrectly placed here and is now moved to the component level
-  };
-
-  // CHANGE 3: Added pagination logic at the component level
   const totalProducts = products.length;
   const totalPages = Math.ceil(totalProducts / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
   const endIndex = startIndex + productsPerPage;
   const currentProducts = products.slice(startIndex, endIndex);
 
-  // CHANGE 4: Defined pagination handlers at the component level
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleProductClick = (product) => {
+    if (product.outOfStock) {
+      alert("This product is out of stock.");
+      return false;
     }
+    return true;
   };
 
   return (
@@ -160,7 +156,6 @@ function ShopPage() {
               </div>
             </div>
           </div>
-
           <div className="accordion" id="size-filters">
             <div className="accordion-item mb-4 pb-3">
               <h5 className="accordion-header" id="accordion-heading-size">
@@ -206,7 +201,7 @@ function ShopPage() {
                     </Link>
                     <Link
                       to="/size/m"
-                      className="swatch-size btn btn-sm Chabtn-outline-light mb-3 me-3 js-filter"
+                      className="swatch-size btn btn-sm btn-outline-light mb-3 me-3 js-filter"
                     >
                       M
                     </Link>
@@ -338,7 +333,6 @@ function ShopPage() {
           <div className="mb-3 pb-2 pb-xl-3" />
 
           {/* Product Grid */}
-          {/* CHANGE 5: Updated to use currentProducts instead of products */}
           <div className="product-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {currentProducts.length > 0 ? (
               currentProducts.map((product) => (
@@ -348,41 +342,53 @@ function ShopPage() {
                       <div className="swiper-container background-img js-swiper-slider">
                         <div className="swiper-wrapper">
                           <div className="swiper-slide">
-                            {product.outOfStock ? (
-                              <div className="out-of-stock-overlay absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-medium">
+                            <Link
+                              to={
+                                product.outOfStock
+                                  ? "#"
+                                  : `/item/${product._id}`
+                              }
+                              onClick={() => handleProductClick(product)}
+                            >
+                              <img
+                                loading="lazy"
+                                src={
+                                  Array.isArray(product.images) &&
+                                  product.images.length > 0
+                                    ? product.images[0]
+                                    : "/path/to/fallback-image.jpg"
+                                }
+                                alt={product.name}
+                                className="pc__img w-full h-64 object-cover"
+                              />
+                            </Link>
+                            {product.outOfStock && (
+                              <div className="out-of-stock-overlay absolute top-2 left-2 bg-red-600 text-white text-xs font-medium px-2 py-1 rounded">
                                 Out of Stock
                               </div>
-                            ) : (
-                              <Link to={`/item/${product._id}`}>
-                                <img
-                                  loading="lazy"
-                                  src={
-                                    Array.isArray(product.images) &&
-                                    product.images.length > 0
-                                      ? product.images[0]
-                                      : ""
-                                  }
-                                  alt={product.name}
-                                  className="pc__img w-full h-64 object-cover"
-                                />
-                              </Link>
                             )}
                           </div>
                           {product.images && product.images[1] && (
                             <div className="swiper-slide">
-                              {product.outOfStock ? (
-                                <div className="out-of-stock-overlay absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-medium">
+                              <Link
+                                to={
+                                  product.outOfStock
+                                    ? "#"
+                                    : `/item/${product._id}`
+                                }
+                                onClick={() => handleProductClick(product)}
+                              >
+                                <img
+                                  loading="lazy"
+                                  src={product.images[1]}
+                                  alt={`${product.name} alt`}
+                                  className="pc__img w-full h-64 object-cover"
+                                />
+                              </Link>
+                              {product.outOfStock && (
+                                <div className="out-of-stock-overlay absolute top-2 left-2 bg-red-600 text-white text-xs font-medium px-2 py-1 rounded">
                                   Out of Stock
                                 </div>
-                              ) : (
-                                <Link to={`/item/${product._id}`}>
-                                  <img
-                                    loading="lazy"
-                                    src={product.images[1]}
-                                    alt={`${product.name} alt`}
-                                    className="pc__img w-full h-64 object-cover"
-                                  />
-                                </Link>
                               )}
                             </div>
                           )}
@@ -399,20 +405,25 @@ function ShopPage() {
                                 <use href="#icon_next_sm" />
                               </svg>
                             </span>
-                            ває
                           </>
                         )}
                       </div>
-                      {!product.outOfStock && (
+                      {!product.outOfStock ? (
                         <Link
                           to={`/item/${product._id}`}
                           className="view-page absolute inset-0 flex items-center justify-center text-white bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-200 text-sm font-medium"
                         >
                           View Page
                         </Link>
+                      ) : (
+                        <div
+                          onClick={() => handleProductClick(product)}
+                          className="view-page absolute inset-0 flex items-center justify-center text-white bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-200 text-sm font-medium cursor-pointer"
+                        >
+                          View Page
+                        </div>
                       )}
                     </div>
-
                     <div className="pc__info">
                       <div className="pc__header flex justify-between items-center">
                         <WishlistButton
@@ -453,48 +464,46 @@ function ShopPage() {
               <p>No products available.</p>
             )}
           </div>
+          <div
+            className="pagination"
+            style={{ marginTop: "20px", textAlign: "center" }}
+          >
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              style={{
+                marginRight: "10px",
+                padding: "5px 10px",
+                cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                backgroundColor: currentPage === 1 ? "#ccc" : "#007bff",
+                color: "#fff",
+                border: "none",
+                borderRadius: "5px",
+              }}
+            >
+              Prev
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              style={{
+                marginLeft: "10px",
+                padding: "5px 10px",
+                cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                backgroundColor:
+                  currentPage === totalPages ? "#ccc" : "#007bff",
+                color: "#fff",
+                border: "none",
+                borderRadius: "5px",
+              }}
+            >
+              Next
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* Pagination Controls */}
-      {/* CHANGE 6: Pagination controls remain but now work with defined state and handlers */}
-      <div
-        className="pagination"
-        style={{ marginTop: "20px", textAlign: "center" }}
-      >
-        <button
-          onClick={handlePrevPage}
-          disabled={currentPage === 1}
-          style={{
-            marginRight: "10px",
-            padding: "5px 10px",
-            cursor: currentPage === 1 ? "not-allowed" : "pointer",
-            backgroundColor: currentPage === 1 ? "#ccc" : "#007bff",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-          }}
-        >
-          Prev
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={handleNextPage}
-          disabled={currentPage === totalPages}
-          style={{
-            marginLeft: "10px",
-            padding: "5px 10px",
-            cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-            backgroundColor: currentPage === totalPages ? "#ccc" : "#007bff",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-          }}
-        >
-          Next
-        </button>
       </div>
     </div>
   );

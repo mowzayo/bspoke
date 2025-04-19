@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { ProductContext } from "../ProductContext";
 import "./Dashboard.css";
 
 function Dashboard() {
+  const { triggerRefresh } = useContext(ProductContext);
   const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
-    image: "",
     description: "",
     sizes: "",
     category: "",
@@ -118,6 +119,7 @@ function Dashboard() {
       });
       if (!response.ok) throw new Error("Failed to save product");
       await fetchProducts();
+      triggerRefresh(); // Trigger global product refresh
       setFormData({
         name: "",
         price: "",
@@ -137,7 +139,6 @@ function Dashboard() {
     setFormData({
       name: product.name,
       price: product.price,
-      image: product.images ? product.images[0] : "",
       description: product.description,
       sizes: product.sizes ? product.sizes.join(", ") : "",
       category: product.category || "",
@@ -157,6 +158,7 @@ function Dashboard() {
       });
       if (!response.ok) throw new Error("Failed to delete product");
       await fetchProducts();
+      triggerRefresh(); // Trigger global product refresh
     } catch (error) {
       console.error("Error deleting product:", error);
     }
@@ -251,7 +253,7 @@ function Dashboard() {
           <option value="gift">Gift</option>
         </select>
 
-        <div className="flex items-centerr gap-2 border-black border-black p-2 rounded w-[170px] mb-3">
+        <div className="flex items-center gap-2 border border-black p-2 rounded w-[170px] mb-3">
           <label className="toggle-switch">
             <input
               type="checkbox"

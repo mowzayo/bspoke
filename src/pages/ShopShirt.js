@@ -1,46 +1,45 @@
-import { useState, useEffect } from "react";
+// src/components/ShopShirt.js
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import "swiper/swiper-bundle.css";
 import { useCart } from "../CartContext";
+import { ProductContext } from "../ProductContext";
 import "./ShopPage.css";
 import bvideo from "../assets/bvideo.mp4";
 import WishlistButton from "./WishlistButton";
 
 function ShopShirt() {
-  const [products, setProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1); // Added state for current page
-  const [productsPerPage] = useState(8); // Added state for products per page
+  const { products } = useContext(ProductContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage, setProductsPerPage] = useState(
+    window.matchMedia("(min-width: 768px)").matches ? 9 : 8
+  );
   const { addToWishlist } = useCart();
 
+  // Responsive pagination
   useEffect(() => {
-    fetchProducts();
+    const handleResize = () => {
+      setProductsPerPage(
+        window.matchMedia("(min-width: 768px)").matches ? 9 : 8
+      );
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const fetchProducts = async () => {
-    try {
-      const API_BASE_URL =
-        process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const response = await fetch(`${API_BASE_URL}/api/products`); // Public endpoint, no token needed
-      if (!response.ok) throw new Error("Failed to fetch products");
-      const data = await response.json();
-      console.log("Fetched products for ShopShirt:", data);
-      // Filter products to show only those with category "shirt"
-      const shirtProducts = Array.isArray(data)
-        ? data.filter((product) => product?.category?.toLowerCase() === "shirt")
-        : [];
-      setProducts(shirtProducts);
-    } catch (err) {
-      console.error("Fetch error:", err);
-    }
-  };
-  // CHANGE 3: Added pagination logic at the component level
-  const totalProducts = products.length;
+  // Filter products for "shirt" category
+  const shirtProducts = products.filter(
+    (product) => product?.category?.toLowerCase() === "shirt"
+  );
+
+  // Pagination logic
+  const totalProducts = shirtProducts.length;
   const totalPages = Math.ceil(totalProducts / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
   const endIndex = startIndex + productsPerPage;
-  const currentProducts = products.slice(startIndex, endIndex);
+  const currentProducts = shirtProducts.slice(startIndex, endIndex);
 
-  // CHANGE 4: Defined pagination handlers at the component level
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
@@ -51,6 +50,14 @@ function ShopShirt() {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
+  };
+
+  const handleProductClick = (product) => {
+    if (product.outOfStock) {
+      alert("This product is out of stock.");
+      return false;
+    }
+    return true;
   };
 
   return (
@@ -160,7 +167,6 @@ function ShopShirt() {
               </div>
             </div>
           </div>
-
           <div className="accordion" id="size-filters">
             <div className="accordion-item mb-4 pb-3">
               <h5 className="accordion-header" id="accordion-heading-size">
@@ -339,31 +345,50 @@ function ShopShirt() {
 
           {/* Product Grid */}
           <div className="product-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.length > 0 ? (
-              products.map((product) => (
+            {currentProducts.length > 0 ? (
+              currentProducts.map((product) => (
                 <div className="product-card-wrapper" key={product._id}>
                   <div className="product-card mb-3 mb-md-4 mb-xxl-5">
                     <div className="pc__img-wrapper relative">
                       <div className="swiper-container background-img js-swiper-slider">
                         <div className="swiper-wrapper">
                           <div className="swiper-slide">
-                            <Link to={`/item/${product._id}`}>
+                            <Link
+                              to={
+                                product.outOfStock
+                                  ? "#"
+                                  : `/item/${product._id}`
+                              }
+                              onClick={() => handleProductClick(product)}
+                            >
                               <img
                                 loading="lazy"
                                 src={
                                   Array.isArray(product.images) &&
                                   product.images.length > 0
                                     ? product.images[0]
-                                    : ""
+                                    : "/path/to/fallback-image.jpg"
                                 }
                                 alt={product.name}
                                 className="pc__img w-full h-64 object-cover"
                               />
                             </Link>
+                            {product.outOfStock && (
+                              <div className="out-of-stock-overlay absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-medium">
+                                Out of Stock
+                              </div>
+                            )}
                           </div>
                           {product.images && product.images[1] && (
                             <div className="swiper-slide">
-                              <Link to={`/item/${product._id}`}>
+                              <Link
+                                to={
+                                  product.outOfStock
+                                    ? "#"
+                                    : `/item/${product._id}`
+                                }
+                                onClick={() => handleProductClick(product)}
+                              >
                                 <img
                                   loading="lazy"
                                   src={product.images[1]}
@@ -371,31 +396,52 @@ function ShopShirt() {
                                   className="pc__img w-full h-64 object-cover"
                                 />
                               </Link>
+                              {product.outOfStock && (
+                                <div className="out-of-stock-overlay absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-medium">
+                                  Out of Stock
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
-                        <span className="pc__img-prev">
-                          <svg width={7} height={11} viewBox="0 0 7 11">
-                            <use href="#icon_prev_sm" />
-                          </svg>
-                        </span>
-                        <span className="pc__img-next">
-                          <svg width={7} height={11} viewBox="0 0 7 11">
-                            <use href="#icon_next_sm" />
-                          </svg>
-                        </span>
+                        {!product.outOfStock && (
+                          <>
+                            <span className="pc__img-prev">
+                              <svg width={7} height={11} viewBox="0 0 7 11">
+                                <use href="#icon_prev_sm" />
+                              </svg>
+                            </span>
+                            <span className="pc__img-next">
+                              <svg width={7} height={11} viewBox="0 0 7 11">
+                                <use href="#icon_next_sm" />
+                              </svg>
+                            </span>
+                          </>
+                        )}
                       </div>
-                      <Link
-                        to={`/item/${product._id}`}
-                        className="view-page absolute inset-0 flex items-center justify-center text-white bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-200 text-sm font-medium"
-                      >
-                        View Page
-                      </Link>
+                      {!product.outOfStock ? (
+                        <Link
+                          to={`/item/${product._id}`}
+                          className="view-page absolute inset-0 flex items-center justify-center text-white bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-200 text-sm font-medium"
+                        >
+                          View Page
+                        </Link>
+                      ) : (
+                        <div
+                          onClick={() => handleProductClick(product)}
+                          className="view-page absolute inset-0 flex items-center justify-center text-white bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-200 text-sm font-medium cursor-pointer"
+                        >
+                          View Page
+                        </div>
+                      )}
                     </div>
-
                     <div className="pc__info">
                       <div className="pc__header flex justify-between items-center">
-                        <WishlistButton product={product} iconOnly />
+                        <WishlistButton
+                          product={product}
+                          iconOnly
+                          disabled={product.outOfStock}
+                        />
                         <div className="product-card__price d-flex">
                           {product.oldPrice && (
                             <span className="money price price-old">
@@ -408,8 +454,19 @@ function ShopShirt() {
                         </div>
                       </div>
                       <h6 className="pc__title">
-                        <Link to={`/item/${product._id}`}>{product.name}</Link>
+                        {product.outOfStock ? (
+                          <span>{product.name}</span>
+                        ) : (
+                          <Link to={`/item/${product._id}`}>
+                            {product.name}
+                          </Link>
+                        )}
                       </h6>
+                      {product.outOfStock && (
+                        <p className="out-of-stock-text text-red-500 text-sm mt-2">
+                          Out of Stock
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -422,7 +479,6 @@ function ShopShirt() {
       </div>
 
       {/* Pagination Controls */}
-      {/* CHANGE 6: Pagination controls remain but now work with defined state and handlers */}
       <div
         className="pagination"
         style={{ marginTop: "20px", textAlign: "center" }}
