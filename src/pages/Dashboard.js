@@ -164,11 +164,6 @@ function Dashboard() {
     }
   };
 
-  const handleLogout = async () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
   // Pagination Logic
   const totalProducts = products.length;
   const totalPages = Math.ceil(totalProducts / productsPerPage);
@@ -253,7 +248,7 @@ function Dashboard() {
           <option value="gift">Gift</option>
         </select>
 
-        <div className="flex items-center gap-2 border border-black p-2 rounded w-[170px] mb-3">
+        <div className="sel items-center gap-2 p-2 rounded w-[170px] mb-3">
           <label className="toggle-switch">
             <input
               type="checkbox"
@@ -264,7 +259,7 @@ function Dashboard() {
             />
             <span className="slider"></span>
           </label>
-          <span>Out of Stock</span>
+          <span> Out of Stock</span>
         </div>
 
         <button className="submit" type="submit">
